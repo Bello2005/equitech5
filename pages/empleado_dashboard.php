@@ -300,38 +300,36 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                 <div class="max-w-7xl mx-auto px-4 md:px-8 py-6">
 
                     <!-- Welcome Screen -->
-                    <div x-show="messages.length === 0" x-cloak class="slide-up">
+                    <div class="slide-up">
                         <!-- Saludo -->
                         <div class="max-w-4xl mx-auto mb-10">
-                            <div class="flex items-start space-x-4">
-                                <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 p-2">
-                                    <img src="../assets/images/logo-comfachoco-no-lema.svg" alt="ComfaChoco" class="w-full h-full object-contain">
-                                </div>
-                                <div>
-                                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-                                        ¡Hola <?= htmlspecialchars($primer_nombre) ?>! 👋
-                                    </h2>
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 p-2">
+                                        <img src="../assets/images/logo-comfachoco-no-lema.svg" alt="ComfaChoco" class="w-full h-full object-contain">
+                                    </div>
+                                    <div>
+                                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+                                            ¡Hola <?= htmlspecialchars($primer_nombre) ?>! 👋
+                                            <span class="text-primary font-semibold text-2xl">Tienes 15 días de vacaciones disponibles.</span>
+                                        </h2>
                                     <p class="text-lg md:text-xl text-gray-600 mb-2">
-                                        Soy el asistente de ComfaChoco. Estoy aquí para ayudarte con tus permisos y vacaciones de forma sencilla.
-                                    </p>
-                                    <p class="text-lg text-gray-700">
-                                        Tienes <span class="text-primary font-semibold text-2xl">15 días</span> de vacaciones disponibles.
-                                    </p>
+                                            Soy el asistente de ComfaChoco. Estoy aquí para ayudarte con tus permisos y vacaciones de forma sencilla.
+                                        </p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Botones de Acción -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
-                            <button @click="quickMessage('Quiero solicitar vacaciones')"
+                            <button @click="quickMessage('Quiero solicitar permisos')"
                                     class="card-hover bg-white border-2 border-primary/20 rounded-xl p-5 text-left shadow-lg hover:border-primary">
                                 <div class="flex items-center space-x-4">
                                     <div class="w-14 h-14 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
-                                        <i class="fas fa-umbrella-beach text-white text-xl"></i>
+                                        <i class="fas fa-clipboard-list text-white text-xl"></i>
                                     </div>
                                     <div class="flex-1">
-                                        <h3 class="font-bold text-gray-900 text-base mb-1">Solicitar Vacaciones</h3>
-                                        <p class="text-gray-600 text-sm">Gestiona tus días de descanso</p>
+                                        <h3 class="font-bold text-gray-900 text-base mb-1">Solicitar Permisos</h3>
+                                        <p class="text-gray-600 text-sm">Gestiona tus permisos y vacaciones</p>
                                     </div>
                                 </div>
                             </button>
@@ -405,6 +403,17 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                             <div class="max-w-xl">
                                                 <div class="bg-primary rounded-2xl rounded-tr-md px-6 py-4 shadow-lg">
                                                     <p class="text-white text-base leading-relaxed" x-text="message.text"></p>
+                                                    <!-- Archivos adjuntos -->
+                                                    <div x-show="message.files && message.files.length > 0" class="mt-3 pt-3 border-t border-white/20">
+                                                        <div class="flex flex-wrap gap-2">
+                                                            <template x-for="(file, index) in message.files" :key="index">
+                                                                <div class="bg-white/20 rounded-lg px-3 py-2 flex items-center space-x-2">
+                                                                    <i class="fas fa-file text-white text-sm"></i>
+                                                                    <span class="text-white text-sm font-medium" x-text="file.name"></span>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <p class="text-xs text-gray-400 mt-2 mr-4 text-right" x-text="message.time"></p>
                                             </div>
@@ -441,13 +450,28 @@ $page_title = 'Asistente Virtual - ComfaChoco';
             <!-- Input Area Premium -->
             <div class="bg-white border-t border-gray-100 px-6 md:px-8 py-6">
                 <form @submit.prevent="sendMessage()">
+                    <!-- Archivos adjuntos -->
+                    <div x-show="attachedFiles.length > 0" class="mb-4">
+                        <div class="flex items-center space-x-2 flex-wrap gap-2">
+                            <template x-for="(file, index) in attachedFiles" :key="index">
+                                <div class="flex items-center space-x-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
+                                    <i class="fas fa-file text-blue-600"></i>
+                                    <span class="text-sm font-medium text-gray-700" x-text="file.name"></span>
+                                    <button type="button" @click="removeFile(index)" class="text-red-500 hover:text-red-700">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
                     <div class="flex items-end space-x-4">
                         <div class="flex-1">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Escribe tu consulta:</label>
                             <div class="relative">
                                 <input type="text"
                                        x-model="currentMessage"
-                                       placeholder="Ejemplo: Quiero solicitar vacaciones del 15 al 20 de diciembre..."
+                                       placeholder="Ejemplo: Quiero solicitar permisos..."
                                        class="input-focus w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl bg-gray-50 focus:bg-white transition-all duration-300"
                                        autofocus>
                                 <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
@@ -455,11 +479,31 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                 </div>
                             </div>
                         </div>
+                        <div class="flex flex-col space-y-2">
+                            <button type="button"
+                                    @click="$refs.fileInput.click()"
+                                    class="px-4 py-4 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center text-gray-600 transition-all duration-300 shadow-md hover:shadow-lg">
+                                <i class="fas fa-paperclip text-xl"></i>
+                            </button>
+                            <input type="file" 
+                                   x-ref="fileInput" 
+                                   @change="handleFileSelect($event)"
+                                   multiple
+                                   accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                   class="hidden">
+                        </div>
                         <button type="submit"
-                                :disabled="!currentMessage.trim()"
+                                :disabled="!currentMessage.trim() && attachedFiles.length === 0"
                                 class="btn-primary px-8 py-4 text-white font-semibold rounded-xl flex items-center space-x-3 shadow-lg text-base">
                             <span>Enviar</span>
                             <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-center mt-4">
+                        <button @click="volverAlMenu()" 
+                                class="flex items-center space-x-2 text-gray-600 hover:text-primary transition-colors duration-300 px-4 py-2 rounded-lg hover:bg-gray-50">
+                            <i class="fas fa-home"></i>
+                            <span class="text-sm font-medium">Volver al menú principal</span>
                         </button>
                     </div>
                     <p class="text-sm text-gray-500 mt-3 text-center">
@@ -476,9 +520,12 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                 messages: [],
                 currentMessage: '',
                 isTyping: false,
+                attachedFiles: [],
 
                 init() {
                     this.scrollToBottom();
+                    // Guardar referencia global
+                    window.chatInstance = this;
 
                     // Event delegation para los botones de opciones
                     document.addEventListener('click', (e) => {
@@ -495,27 +542,39 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                 },
 
                 sendMessage() {
-                    if (!this.currentMessage.trim()) return;
+                    if (!this.currentMessage.trim() && this.attachedFiles.length === 0) return;
 
                     const now = new Date();
                     const time = now.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 
+                    // Mensaje con archivos adjuntos
+                    let messageText = this.currentMessage;
+                    if (this.attachedFiles.length > 0) {
+                        const filesInfo = this.attachedFiles.map(f => f.name).join(', ');
+                        messageText += ` (Archivos adjuntos: ${filesInfo})`;
+                    }
+
                     this.messages.push({
                         type: 'user',
-                        text: this.currentMessage,
+                        text: messageText,
+                        files: this.attachedFiles.map(f => ({ name: f.name, size: f.size, type: f.type })),
                         time: time
                     });
 
                     const userMessage = this.currentMessage.toLowerCase();
                     this.currentMessage = '';
+                    this.attachedFiles = []; // Limpiar archivos después de enviar
                     this.isTyping = true;
                     this.scrollToBottom();
 
                     setTimeout(() => {
                         this.isTyping = false;
+                        // Obtener archivos del último mensaje enviado
+                        const lastMessage = this.messages[this.messages.length - 1];
+                        const files = lastMessage.files || [];
                         this.messages.push({
                             type: 'bot',
-                            text: this.getBotResponse(userMessage),
+                            text: this.getBotResponse(userMessage, files),
                             time: time
                         });
                         this.scrollToBottom();
@@ -527,7 +586,117 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                     this.sendMessage();
                 },
 
-                getBotResponse(message) {
+                handleFileSelect(event) {
+                    const files = Array.from(event.target.files);
+                    const maxSize = 5 * 1024 * 1024; // 5MB
+                    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                    
+                    files.forEach(file => {
+                        // Validar tipo de archivo
+                        if (!allowedTypes.includes(file.type)) {
+                            alert(`El archivo "${file.name}" no es un tipo válido. Solo se permiten PDF, JPG, PNG, DOC, DOCX`);
+                            return;
+                        }
+                        
+                        // Validar tamaño
+                        if (file.size > maxSize) {
+                            alert(`El archivo "${file.name}" es demasiado grande. El tamaño máximo es 5MB`);
+                            return;
+                        }
+                        
+                        // Agregar archivo a la lista
+                        this.attachedFiles.push({
+                            name: file.name,
+                            size: file.size,
+                            type: file.type,
+                            file: file
+                        });
+                    });
+                    
+                    // Limpiar el input
+                    event.target.value = '';
+                },
+
+                removeFile(index) {
+                    this.attachedFiles.splice(index, 1);
+                },
+
+                getBotResponse(message, files = []) {
+                    // Detectar si hay archivos adjuntos y mostrar aprobación automática
+                    if (files && files.length > 0) {
+                        return `
+                            <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4 my-4">
+                                <p class="flex items-center text-green-800">
+                                    <i class="fas fa-check-circle mr-2"></i>
+                                    <strong>✓ Solicitud Aprobada Automáticamente</strong>
+                                </p>
+                                <p class="text-sm text-green-700 mt-2 ml-5">Documentos recibidos correctamente. Tu solicitud ha sido procesada.</p>
+                            </div>
+                            <p class="text-gray-600">Solicitud completada exitosamente. Recibirás notificación por correo.</p>
+                            ${this.getActionButtons()}
+                        `;
+                    }
+
+                    // Detectar solicitud de vacaciones con fechas (sin archivos)
+                    if (message.includes('vacaciones del') && message.includes('al')) {
+                        return `
+                            <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4 my-4">
+                                <p class="flex items-center text-green-800">
+                                    <i class="fas fa-check-circle mr-2"></i>
+                                    <strong>✓ Solicitud de Vacaciones Aprobada Automáticamente</strong>
+                                </p>
+                                <p class="text-sm text-green-700 mt-2 ml-5">Tu solicitud ha sido procesada exitosamente.</p>
+                            </div>
+                            <p class="text-gray-600">Tu solicitud de vacaciones será revisada y recibirás notificación por correo.</p>
+                            ${this.getActionButtons()}
+                        `;
+                    }
+
+                    // Detectar solicitud de licencia de paternidad con fechas
+                    if (message.includes('licencia de paternidad del') && message.includes('al')) {
+                        return `
+                            <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4 my-4">
+                                <p class="flex items-center text-green-800">
+                                    <i class="fas fa-check-circle mr-2"></i>
+                                    <strong>✓ Solicitud de Licencia de Paternidad Aprobada Automáticamente</strong>
+                                </p>
+                                <p class="text-sm text-green-700 mt-2 ml-5">Tu solicitud ha sido procesada exitosamente.</p>
+                            </div>
+                            <p class="text-gray-600">Tu solicitud será revisada y recibirás notificación por correo. Recuerda adjuntar el certificado.</p>
+                            ${this.getActionButtons()}
+                        `;
+                    }
+
+                    // Detectar solicitud de licencia de maternidad con fechas
+                    if (message.includes('licencia de maternidad del') && message.includes('al')) {
+                        return `
+                            <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4 my-4">
+                                <p class="flex items-center text-green-800">
+                                    <i class="fas fa-check-circle mr-2"></i>
+                                    <strong>✓ Solicitud de Licencia de Maternidad Aprobada Automáticamente</strong>
+                                </p>
+                                <p class="text-sm text-green-700 mt-2 ml-5">Tu solicitud ha sido procesada exitosamente.</p>
+                            </div>
+                            <p class="text-gray-600">Tu solicitud será revisada y recibirás notificación por correo. Recuerda adjuntar el certificado.</p>
+                            ${this.getActionButtons()}
+                        `;
+                    }
+
+                    // Detectar solicitud de permiso médico con fechas
+                    if (message.includes('permiso médico del') && message.includes('al')) {
+                        return `
+                            <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4 my-4">
+                                <p class="flex items-center text-green-800">
+                                    <i class="fas fa-check-circle mr-2"></i>
+                                    <strong>✓ Solicitud de Permiso Médico Aprobada Automáticamente</strong>
+                                </p>
+                                <p class="text-sm text-green-700 mt-2 ml-5">Tu solicitud ha sido procesada exitosamente.</p>
+                            </div>
+                            <p class="text-gray-600">Tu solicitud será revisada y recibirás notificación por correo.</p>
+                            ${this.getActionButtons()}
+                        `;
+                    }
+
                     if ((message.includes('solicitar') || message.includes('pedir') || message.includes('quiero')) &&
                         (message.includes('permiso') || message.includes('vacacion'))) {
                         return `
@@ -536,22 +705,22 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                             <div class="bg-primary/5 rounded-xl p-5 space-y-3 my-4">
                                 <div data-option="1" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
                                     <span class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">1</span>
-                                    <span class="font-medium text-lg text-left flex-1">Vacaciones</span>
+                                    <span class="font-medium text-lg text-left flex-1">Vacaciones (15 días hábiles/año)</span>
                                     <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                 </div>
                                 <div data-option="2" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
                                     <span class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">2</span>
-                                    <span class="font-medium text-lg text-left flex-1">Permiso médico</span>
+                                    <span class="font-medium text-lg text-left flex-1">Licencia de Paternidad/Maternidad</span>
                                     <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                 </div>
                                 <div data-option="3" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
                                     <span class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">3</span>
-                                    <span class="font-medium text-lg text-left flex-1">Permiso personal</span>
+                                    <span class="font-medium text-lg text-left flex-1">Permiso Médico</span>
                                     <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                 </div>
                                 <div data-option="4" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
                                     <span class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">4</span>
-                                    <span class="font-medium text-lg text-left flex-1">Calamidad doméstica</span>
+                                    <span class="font-medium text-lg text-left flex-1">Otras Causas</span>
                                     <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                 </div>
                             </div>
@@ -575,7 +744,7 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                             </div>
                                             <div>
                                                 <p class="text-sm text-gray-600">Vacaciones</p>
-                                                <p class="text-3xl font-bold text-blue-600">12 días</p>
+                                                <p class="text-3xl font-bold text-blue-600">15 días</p>
                                             </div>
                                         </div>
                                     </div>
@@ -584,11 +753,11 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center space-x-4">
                                             <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
-                                                <i class="fas fa-heartbeat text-white text-xl"></i>
+                                                <i class="fas fa-baby text-white text-xl"></i>
                                             </div>
                                             <div>
-                                                <p class="text-sm text-gray-600">Permiso médico</p>
-                                                <p class="text-3xl font-bold text-green-600">5 días</p>
+                                                <p class="text-sm text-gray-600">Licencia de Paternidad</p>
+                                                <p class="text-3xl font-bold text-green-600">15 días</p>
                                             </div>
                                         </div>
                                     </div>
@@ -597,11 +766,24 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center space-x-4">
                                             <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
-                                                <i class="fas fa-clock text-white text-xl"></i>
+                                                <i class="fas fa-baby-carriage text-white text-xl"></i>
                                             </div>
                                             <div>
-                                                <p class="text-sm text-gray-600">Permiso personal</p>
-                                                <p class="text-3xl font-bold text-purple-600">3 días</p>
+                                                <p class="text-sm text-gray-600">Licencia de Maternidad</p>
+                                                <p class="text-3xl font-bold text-purple-600">4 meses</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-5 shadow-sm">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-4">
+                                            <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center">
+                                                <i class="fas fa-file-medical text-white text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm text-gray-600">Permiso por Enfermedad</p>
+                                                <p class="text-3xl font-bold text-red-600">Con orden médica</p>
                                             </div>
                                         </div>
                                     </div>
@@ -645,6 +827,7 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                 <i class="fas fa-bell text-blue-500 mr-2"></i>
                                 Recibirás una notificación por correo cuando tu solicitud sea procesada.
                             </p>
+                            ${this.getActionButtons()}
                         `;
                     }
 
@@ -656,143 +839,500 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                     <i class="fas fa-check-circle text-primary text-xl mt-1"></i>
                                     <div>
                                         <p class="font-semibold text-gray-900 mb-1">Vacaciones:</p>
-                                        <p class="text-gray-700">Deben solicitarse con 15 días de anticipación mínimo</p>
+                                        <p class="text-gray-700">15 días hábiles por período de un año, acumulables hasta 2 períodos. Se solicitan 1 mes posterior al cumplimiento del período. Los sábados cuentan como día hábil.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-check-circle text-primary text-xl mt-1"></i>
+                                    <div>
+                                        <p class="font-semibold text-gray-900 mb-1">Maternidad/Paternidad:</p>
+                                        <p class="text-gray-700">Mujeres: 4 meses | Hombres: 15 días. Requiere certificado.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start space-x-3">
                                     <i class="fas fa-check-circle text-primary text-xl mt-1"></i>
                                     <div>
                                         <p class="font-semibold text-gray-900 mb-1">Permisos Médicos:</p>
-                                        <p class="text-gray-700">Requieren presentar certificado médico original</p>
+                                        <p class="text-gray-700">Requieren órdenes médicas y todos los anexos relacionados con la enfermedad.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start space-x-3">
                                     <i class="fas fa-check-circle text-primary text-xl mt-1"></i>
                                     <div>
-                                        <p class="font-semibold text-gray-900 mb-1">Permisos Personales:</p>
-                                        <p class="text-gray-700">Máximo 3 días al año, solicitar con 3 días de anticipación</p>
+                                        <p class="font-semibold text-gray-900 mb-1">Aprobación:</p>
+                                        <p class="text-gray-700">Menos de 2 días: con jefe inmediato | Más de 3 días: con Recursos Humanos</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start space-x-3">
                                     <i class="fas fa-check-circle text-primary text-xl mt-1"></i>
                                     <div>
-                                        <p class="font-semibold text-gray-900 mb-1">Tiempo de Respuesta:</p>
-                                        <p class="text-gray-700">Todas las solicitudes se revisan en máximo 48 horas</p>
+                                        <p class="font-semibold text-gray-900 mb-1">Gestión de Reemplazo:</p>
+                                        <p class="text-gray-700">70% de funcionarios deben estar disponibles. Personas de la misma dependencia no pueden salir al mismo tiempo.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <i class="fas fa-check-circle text-primary text-xl mt-1"></i>
+                                    <div>
+                                        <p class="font-semibold text-gray-900 mb-1">Otras Causas:</p>
+                                        <p class="text-gray-700">Incluye: muerte de familiar (certificado de defunción), miembro/jurado (documento acreditativo), y otras con anexo correspondiente</p>
                                     </div>
                                 </div>
                             </div>
                             <p class="text-gray-600">¿Necesitas más información sobre alguna política en específico?</p>
+                            ${this.getActionButtons()}
                         `;
                     }
 
                     if (message.includes('1') || message.includes('vacaciones')) {
                         return `
                             <p class="text-lg font-semibold mb-4">🏖️ Solicitud de Vacaciones</p>
-                            <p class="mb-3">Actualmente tienes <strong class="text-primary text-xl">12 días disponibles</strong> para tomar.</p>
+                            <p class="mb-3">Actualmente tienes <strong class="text-primary text-xl">15 días disponibles</strong> para tomar.</p>
                             <div class="bg-blue-50 rounded-xl p-5 my-4">
-                                <p class="font-semibold mb-3">Para continuar, necesito que me indiques:</p>
-                                <ul class="space-y-2">
-                                    <li class="flex items-center space-x-2">
-                                        <i class="fas fa-calendar text-blue-600"></i>
-                                        <span><strong>Fecha de inicio:</strong> Día que empieza tus vacaciones</span>
-                                    </li>
-                                    <li class="flex items-center space-x-2">
-                                        <i class="fas fa-calendar text-blue-600"></i>
-                                        <span><strong>Fecha de fin:</strong> Último día de vacaciones</span>
-                                    </li>
-                                </ul>
+                                <p class="font-semibold mb-3">Selecciona las fechas de tus vacaciones:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-calendar-alt text-blue-600 mr-2"></i>
+                                            Fecha de inicio
+                                        </label>
+                                        <input type="date" id="fecha-inicio" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin').min = this.value; calcularDiasVacaciones();">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-calendar-check text-blue-600 mr-2"></i>
+                                            Fecha de fin
+                                        </label>
+                                        <input type="date" id="fecha-fin" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasVacaciones()">
+                                    </div>
+                                </div>
+                                <div id="dias-resultado" class="mt-3 px-4 py-2 bg-blue-100 border border-blue-300 rounded-lg text-center hidden">
+                                    <p class="text-sm font-semibold text-blue-800">
+                                        <i class="fas fa-calendar-week mr-2"></i>
+                                        <span id="dias-texto">0 días</span> de vacaciones solicitados
+                                    </p>
+                                </div>
+                                <button onclick="procesarVacaciones()" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
+                                    <i class="fas fa-paper-plane mr-2"></i>
+                                    Enviar Solicitud de Vacaciones
+                                </button>
                             </div>
-                            <p class="text-gray-600 bg-gray-50 rounded-lg p-3">
-                                <strong>Ejemplo:</strong> "Quiero vacaciones del 15 al 20 de diciembre"
+                            <div class="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-4 my-4">
+                                <p class="flex items-center text-yellow-800 mb-2">
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                                    <strong>Importante:</strong> Las vacaciones deben solicitarse 1 mes posterior al cumplimiento del período
+                                </p>
+                                <p class="text-sm text-yellow-800 ml-6">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Los sábados cuentan como día hábil. Los días son acumulables hasta 2 períodos.
+                                </p>
+                            </div>
+                        `;
+                    }
+
+                    if (message.includes('2') || message.includes('licencia') && !message.includes('paternidad') && !message.includes('maternidad')) {
+                        return `
+                            <p class="text-lg font-semibold mb-4">👨‍👶👩‍👶 Licencia de Paternidad/Maternidad</p>
+                            <p class="mb-4">Por favor, selecciona el tipo de licencia que necesitas:</p>
+                            <div class="bg-primary/5 rounded-xl p-5 space-y-3 my-4">
+                                <div data-option="paternidad" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
+                                    <span class="w-8 h-8 bg-green-500 text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">P</span>
+                                    <span class="font-medium text-lg text-left flex-1">Licencia de Paternidad (15 días)</span>
+                                    <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                </div>
+                                <div data-option="maternidad" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
+                                    <span class="w-8 h-8 bg-purple-500 text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">M</span>
+                                    <span class="font-medium text-lg text-left flex-1">Licencia de Maternidad (4 meses)</span>
+                                    <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 text-center">
+                                <i class="fas fa-hand-pointer text-primary mr-2"></i>
+                                Haz clic en el tipo de licencia que necesitas
                             </p>
                         `;
                     }
 
-                    if (message.includes('2') || message.includes('médico') || message.includes('medico')) {
+                    if (message.includes('paternidad')) {
+                        return `
+                            <p class="text-lg font-semibold mb-4">👨‍👶 Licencia de Paternidad</p>
+                            <p class="mb-3">Tienes derecho a <strong class="text-primary text-xl">15 días</strong> de licencia de paternidad.</p>
+                            <div class="bg-green-50 rounded-xl p-5 my-4">
+                                <p class="font-semibold mb-3">Selecciona las fechas de tu licencia:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-calendar-alt text-green-600 mr-2"></i>
+                                            Fecha de inicio
+                                        </label>
+                                        <input type="date" id="fecha-inicio-paternidad" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin-paternidad').min = this.value; calcularDiasLicencia('paternidad');">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-calendar-check text-green-600 mr-2"></i>
+                                            Fecha de fin
+                                        </label>
+                                        <input type="date" id="fecha-fin-paternidad" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasLicencia('paternidad');">
+                                    </div>
+                                </div>
+                                <div id="dias-resultado-paternidad" class="mt-3 px-4 py-2 bg-green-100 border border-green-300 rounded-lg text-center hidden">
+                                    <p class="text-sm font-semibold text-green-800">
+                                        <i class="fas fa-calendar-week mr-2"></i>
+                                        <span id="dias-texto-paternidad">0 días</span> de licencia solicitados
+                                    </p>
+                                </div>
+                                <div class="mt-4">
+                                    <p class="font-semibold mb-3">Documentos necesarios:</p>
+                                    <ul class="space-y-2 mb-3">
+                                    <li class="flex items-center space-x-2">
+                                            <i class="fas fa-certificate text-green-600"></i>
+                                            <span>Certificado de nacimiento o adopción</span>
+                                    </li>
+                                    </ul>
+                                    <div class="border-2 border-dashed border-green-300 rounded-lg p-4 bg-green-50/50">
+                                        <label class="flex flex-col items-center justify-center cursor-pointer">
+                                            <input type="file" 
+                                                   id="archivo-paternidad" 
+                                                   onchange="handleFileSelectLicencia('paternidad', this)"
+                                                   accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                                   class="hidden">
+                                            <i class="fas fa-cloud-upload-alt text-green-600 text-3xl mb-2"></i>
+                                            <span class="text-sm font-medium text-gray-700">Adjuntar certificado</span>
+                                            <span class="text-xs text-gray-500 mt-1">PDF, JPG, PNG, DOC o DOCX (máx. 5MB)</span>
+                                        </label>
+                                    </div>
+                                    <div id="archivos-paternidad" class="mt-3 flex flex-wrap gap-2"></div>
+                                </div>
+                                <button onclick="procesarLicencia('paternidad')" class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
+                                    <i class="fas fa-paper-plane mr-2"></i>
+                                    Enviar Solicitud
+                                </button>
+                            </div>
+                        `;
+                    }
+
+                    if (message.includes('maternidad')) {
+                        return `
+                            <p class="text-lg font-semibold mb-4">👩‍👶 Licencia de Maternidad</p>
+                            <p class="mb-3">Tienes derecho a <strong class="text-primary text-xl">4 meses</strong> de licencia de maternidad.</p>
+                            <div class="bg-purple-50 rounded-xl p-5 my-4">
+                                <p class="font-semibold mb-3">Selecciona las fechas de tu licencia:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-calendar-alt text-purple-600 mr-2"></i>
+                                            Fecha de inicio
+                                        </label>
+                                        <input type="date" id="fecha-inicio-maternidad" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin-maternidad').min = this.value; calcularDiasLicencia('maternidad');">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-calendar-check text-purple-600 mr-2"></i>
+                                            Fecha de fin
+                                        </label>
+                                        <input type="date" id="fecha-fin-maternidad" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasLicencia('maternidad');">
+                                    </div>
+                                </div>
+                                <div id="dias-resultado-maternidad" class="mt-3 px-4 py-2 bg-purple-100 border border-purple-300 rounded-lg text-center hidden">
+                                    <p class="text-sm font-semibold text-purple-800">
+                                        <i class="fas fa-calendar-week mr-2"></i>
+                                        <span id="dias-texto-maternidad">0 días</span> de licencia solicitados
+                                    </p>
+                                </div>
+                                <div class="mt-4">
+                                    <p class="font-semibold mb-3">Documentos necesarios:</p>
+                                    <ul class="space-y-2 mb-3">
+                                    <li class="flex items-center space-x-2">
+                                            <i class="fas fa-certificate text-purple-600"></i>
+                                            <span>Certificado de nacimiento o adopción</span>
+                                    </li>
+                                </ul>
+                                    <div class="border-2 border-dashed border-purple-300 rounded-lg p-4 bg-purple-50/50">
+                                        <label class="flex flex-col items-center justify-center cursor-pointer">
+                                            <input type="file" 
+                                                   id="archivo-maternidad" 
+                                                   onchange="handleFileSelectLicencia('maternidad', this)"
+                                                   accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                                   class="hidden">
+                                            <i class="fas fa-cloud-upload-alt text-purple-600 text-3xl mb-2"></i>
+                                            <span class="text-sm font-medium text-gray-700">Adjuntar certificado</span>
+                                            <span class="text-xs text-gray-500 mt-1">PDF, JPG, PNG, DOC o DOCX (máx. 5MB)</span>
+                                        </label>
+                            </div>
+                                    <div id="archivos-maternidad" class="mt-3 flex flex-wrap gap-2"></div>
+                                </div>
+                                <button onclick="procesarLicencia('maternidad')" class="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
+                                    <i class="fas fa-paper-plane mr-2"></i>
+                                    Enviar Solicitud
+                                </button>
+                            </div>
+                        `;
+                    }
+
+                    if (message.includes('3') || message.includes('enfermedad') || message.includes('médico') || message.includes('medico')) {
                         return `
                             <p class="text-lg font-semibold mb-4">🏥 Permiso Médico</p>
-                            <p class="mb-3">Tienes <strong class="text-primary text-xl">5 días disponibles</strong> para permisos médicos.</p>
-                            <div class="bg-green-50 rounded-xl p-5 my-4">
+                            <p class="mb-3">Este permiso requiere documentación médica completa.</p>
+                            <div class="bg-red-50 rounded-xl p-5 my-4">
+                                <p class="font-semibold mb-3">Selecciona las fechas del permiso:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-calendar-alt text-red-600 mr-2"></i>
+                                            Fecha de inicio
+                                        </label>
+                                        <input type="date" id="fecha-inicio-medico" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin-medico').min = this.value; calcularDiasLicencia('medico');">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-calendar-check text-red-600 mr-2"></i>
+                                            Fecha de fin
+                                        </label>
+                                        <input type="date" id="fecha-fin-medico" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasLicencia('medico');">
+                                    </div>
+                                </div>
+                                <div id="dias-resultado-medico" class="mb-4 px-4 py-2 bg-red-100 border border-red-300 rounded-lg text-center hidden">
+                                    <p class="text-sm font-semibold text-red-800">
+                                        <i class="fas fa-calendar-week mr-2"></i>
+                                        <span id="dias-texto-medico">0 días</span> de permiso solicitados
+                                    </p>
+                                </div>
                                 <p class="font-semibold mb-3">Documentos necesarios:</p>
-                                <ul class="space-y-2">
+                                <ul class="space-y-2 mb-3">
                                     <li class="flex items-center space-x-2">
-                                        <i class="fas fa-file-medical text-green-600"></i>
-                                        <span>Certificado médico original</span>
+                                        <i class="fas fa-file-medical text-red-600"></i>
+                                        <span>Orden médica o incapacidad médica</span>
                                     </li>
                                     <li class="flex items-center space-x-2">
-                                        <i class="fas fa-calendar-day text-green-600"></i>
-                                        <span>Fechas del permiso solicitado</span>
+                                        <i class="fas fa-folder-open text-red-600"></i>
+                                        <span>Todos los anexos relacionados con la enfermedad</span>
                                     </li>
                                 </ul>
+                                <div class="border-2 border-dashed border-red-300 rounded-lg p-4 bg-red-50/50">
+                                    <label class="flex flex-col items-center justify-center cursor-pointer">
+                                        <input type="file" 
+                                               id="archivo-medico" 
+                                               onchange="handleFileSelectLicencia('medico', this)"
+                                               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                               multiple
+                                               class="hidden">
+                                        <i class="fas fa-cloud-upload-alt text-red-600 text-3xl mb-2"></i>
+                                        <span class="text-sm font-medium text-gray-700">Adjuntar documentos médicos</span>
+                                        <span class="text-xs text-gray-500 mt-1">PDF, JPG, PNG, DOC o DOCX (máx. 5MB)</span>
+                                    </label>
                             </div>
-                            <p class="text-gray-600">¿En qué fechas necesitas el permiso médico?</p>
-                        `;
-                    }
-
-                    if (message.includes('3') || message.includes('personal')) {
-                        return `
-                            <p class="text-lg font-semibold mb-4">⏰ Permiso Personal</p>
-                            <p class="mb-3">Tienes <strong class="text-primary text-xl">3 días disponibles</strong> de permiso personal este año.</p>
+                                <div id="archivos-medico" class="mt-3 flex flex-wrap gap-2"></div>
+                                <button onclick="procesarPermisoMedico()" class="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
+                                    <i class="fas fa-paper-plane mr-2"></i>
+                                    Enviar Solicitud
+                                </button>
+                            </div>
                             <div class="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-4 my-4">
                                 <p class="flex items-center text-yellow-800">
-                                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                                    <strong>Importante:</strong> Los permisos personales deben solicitarse con al menos 3 días de anticipación
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    <strong>Nota:</strong> Menos de 2 días se aprueba con jefe inmediato | Más de 3 días con Recursos Humanos
                                 </p>
                             </div>
-                            <p class="text-gray-600">Por favor indícame la fecha que necesitas el permiso personal.</p>
                         `;
                     }
 
-                    if (message.includes('4') || message.includes('calamidad')) {
+                    if (message.includes('4') || message.includes('otras') || message.includes('otra')) {
                         return `
-                            <p class="text-lg font-semibold mb-4">🚨 Permiso por Calamidad Doméstica</p>
-                            <p class="mb-4">Este permiso es para situaciones urgentes e imprevistas que requieren tu atención inmediata.</p>
-                            <div class="bg-red-50 rounded-xl p-5 my-4">
-                                <p class="font-semibold mb-3">Por favor describe brevemente:</p>
-                                <ul class="space-y-2">
-                                    <li class="flex items-start space-x-2">
-                                        <i class="fas fa-circle text-red-600 text-xs mt-2"></i>
-                                        <span>La situación de emergencia</span>
+                            <p class="text-lg font-semibold mb-4">📋 Otras Causas</p>
+                            <p class="mb-4">Selecciona el tipo específico de permiso:</p>
+                            <div class="bg-primary/5 rounded-xl p-5 space-y-3 my-4">
+                                <div data-option="muerte-familiar" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
+                                    <span class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">A</span>
+                                    <span class="font-medium text-lg text-left flex-1">Permiso por Muerte de Familiar</span>
+                                    <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            </div>
+                                <div data-option="miembro-jurado" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
+                                    <span class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">B</span>
+                                    <span class="font-medium text-lg text-left flex-1">Permiso Miembro/Jurado</span>
+                                    <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 text-center">
+                                <i class="fas fa-hand-pointer text-primary mr-2"></i>
+                                Haz clic en la opción que necesitas
+                            </p>
+                        `;
+                    }
+
+                    if (message.includes('muerte') || message.includes('familiar') || message.includes('certificado defunción')) {
+                        return `
+                            <p class="text-lg font-semibold mb-4">💔 Permiso por Muerte de Familiar</p>
+                            <p class="mb-3">Este permiso es para situaciones de duelo.</p>
+                            <div class="bg-gray-50 rounded-xl p-5 my-4">
+                                <p class="font-semibold mb-3">Selecciona las fechas de tu permiso:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-calendar-alt text-gray-600 mr-2"></i>
+                                            Fecha de inicio
+                                        </label>
+                                        <input type="date" id="fecha-inicio-muerte" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin-muerte').min = this.value; calcularDiasLicencia('muerte');">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-calendar-check text-gray-600 mr-2"></i>
+                                            Fecha de fin
+                                        </label>
+                                        <input type="date" id="fecha-fin-muerte" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasLicencia('muerte');">
+                                    </div>
+                                </div>
+                                <div id="dias-resultado-muerte" class="mt-3 px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-center hidden">
+                                    <p class="text-sm font-semibold text-gray-800">
+                                        <i class="fas fa-calendar-week mr-2"></i>
+                                        <span id="dias-texto-muerte">0 días</span> de permiso solicitados
+                                    </p>
+                                </div>
+                                <div class="mt-4">
+                                    <p class="font-semibold mb-3">Documentos necesarios:</p>
+                                    <ul class="space-y-2 mb-3">
+                                        <li class="flex items-center space-x-2">
+                                            <i class="fas fa-certificate text-gray-600"></i>
+                                            <span>Certificado de defunción</span>
                                     </li>
-                                    <li class="flex items-start space-x-2">
-                                        <i class="fas fa-circle text-red-600 text-xs mt-2"></i>
-                                        <span>Las fechas que necesitas</span>
+                                        <li class="flex items-center space-x-2">
+                                            <i class="fas fa-users text-gray-600"></i>
+                                            <span>Certificado de parentesco</span>
                                     </li>
                                 </ul>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50/50">
+                                            <label class="flex flex-col items-center justify-center cursor-pointer">
+                                                <input type="file" 
+                                                       id="archivo-defuncion" 
+                                                       onchange="handleFileSelectLicencia('defuncion', this)"
+                                                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                                       class="hidden">
+                                                <i class="fas fa-cloud-upload-alt text-gray-600 text-3xl mb-2"></i>
+                                                <span class="text-sm font-medium text-gray-700">Certificado de defunción</span>
+                                                <span class="text-xs text-gray-500 mt-1">PDF, JPG, PNG, DOC o DOCX (máx. 5MB)</span>
+                                            </label>
+                                        </div>
+                                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50/50">
+                                            <label class="flex flex-col items-center justify-center cursor-pointer">
+                                                <input type="file" 
+                                                       id="archivo-parentesco" 
+                                                       onchange="handleFileSelectLicencia('parentesco', this)"
+                                                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                                       class="hidden">
+                                                <i class="fas fa-cloud-upload-alt text-gray-600 text-3xl mb-2"></i>
+                                                <span class="text-sm font-medium text-gray-700">Certificado de parentesco</span>
+                                                <span class="text-xs text-gray-500 mt-1">PDF, JPG, PNG, DOC o DOCX (máx. 5MB)</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div id="archivos-defuncion" class="mt-3 flex flex-wrap gap-2"></div>
+                                    <div id="archivos-parentesco" class="mt-2 flex flex-wrap gap-2"></div>
+                                </div>
+                                <button onclick="procesarLicencia('muerte')" class="mt-4 w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
+                                    <i class="fas fa-paper-plane mr-2"></i>
+                                    Enviar Solicitud
+                                </button>
+                            </div>
+                        `;
+                    }
+
+                    if (message.includes('miembro') || message.includes('jurado')) {
+                        return `
+                            <p class="text-lg font-semibold mb-4">⚖️ Permiso por Miembro/Jurado</p>
+                            <p class="mb-3">Este permiso es para funciones como miembro de jurado o similar.</p>
+                            <div class="bg-indigo-50 rounded-xl p-5 my-4">
+                                <p class="font-semibold mb-3">Selecciona las fechas de tu permiso:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-calendar-alt text-indigo-600 mr-2"></i>
+                                            Fecha de inicio
+                                        </label>
+                                        <input type="date" id="fecha-inicio-jurado" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin-jurado').min = this.value; calcularDiasLicencia('jurado');">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            <i class="fas fa-calendar-check text-indigo-600 mr-2"></i>
+                                            Fecha de fin
+                                        </label>
+                                        <input type="date" id="fecha-fin-jurado" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasLicencia('jurado');">
+                                    </div>
+                                </div>
+                                <div id="dias-resultado-jurado" class="mt-3 px-4 py-2 bg-indigo-100 border border-indigo-300 rounded-lg text-center hidden">
+                                    <p class="text-sm font-semibold text-indigo-800">
+                                        <i class="fas fa-calendar-week mr-2"></i>
+                                        <span id="dias-texto-jurado">0 días</span> de permiso solicitados
+                                    </p>
+                                </div>
+                                <div class="mt-4">
+                                    <p class="font-semibold mb-3">Documento necesario:</p>
+                                    <ul class="space-y-2 mb-3">
+                                        <li class="flex items-center space-x-2">
+                                            <i class="fas fa-file-alt text-indigo-600"></i>
+                                            <span>Documento que acredite la función</span>
+                                        </li>
+                                    </ul>
+                                    <div class="border-2 border-dashed border-indigo-300 rounded-lg p-4 bg-indigo-50/50">
+                                        <label class="flex flex-col items-center justify-center cursor-pointer">
+                                            <input type="file" 
+                                                   id="archivo-jurado" 
+                                                   onchange="handleFileSelectLicencia('jurado', this)"
+                                                   accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                                   class="hidden">
+                                            <i class="fas fa-cloud-upload-alt text-indigo-600 text-3xl mb-2"></i>
+                                            <span class="text-sm font-medium text-gray-700">Adjuntar documento</span>
+                                            <span class="text-xs text-gray-500 mt-1">PDF, JPG, PNG, DOC o DOCX (máx. 5MB)</span>
+                                        </label>
+                                    </div>
+                                    <div id="archivos-jurado" class="mt-3 flex flex-wrap gap-2"></div>
+                                </div>
+                                <button onclick="procesarLicencia('jurado')" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
+                                    <i class="fas fa-paper-plane mr-2"></i>
+                                    Enviar Solicitud
+                                </button>
                             </div>
                         `;
                     }
 
                     if (message.includes('hola') || message.includes('buenos') || message.includes('buenas')) {
-                        return `<p class="text-lg">¡Hola <strong><?= htmlspecialchars($primer_nombre) ?></strong>! 👋</p><p class="mt-3 text-gray-700">Soy tu asistente virtual de Recursos Humanos de ComfaChoco. Estoy aquí para ayudarte con todo lo relacionado a tus permisos y vacaciones.</p><p class="mt-3 text-gray-700">¿En qué puedo ayudarte hoy?</p>`;
+                        return `<p class="text-lg">¡Hola <strong><?= htmlspecialchars($primer_nombre) ?></strong>! 👋</p><p class="mt-3 text-gray-700">Soy tu asistente virtual de Recursos Humanos de ComfaChoco. Estoy aquí para ayudarte con todo lo relacionado a tus permisos y vacaciones.</p><p class="mt-3 text-gray-700">¿En qué puedo ayudarte hoy?</p>${this.getActionButtons()}`;
                     }
 
                     if (message.includes('gracias')) {
-                        return `<p class="text-lg">¡De nada, <strong><?= htmlspecialchars($primer_nombre) ?></strong>! 😊</p><p class="mt-3 text-gray-700">Es un placer ayudarte. Estoy disponible siempre que me necesites.</p>`;
+                        return `<p class="text-lg">¡De nada, <strong><?= htmlspecialchars($primer_nombre) ?></strong>! 😊</p><p class="mt-3 text-gray-700">Es un placer ayudarte. Estoy disponible siempre que me necesites.</p>${this.getActionButtons()}`;
                     }
 
                     return `
-                        <p class="mb-4">Puedo ayudarte con las siguientes opciones:</p>
-                        <div class="grid grid-cols-2 gap-3 my-4">
-                            <div class="bg-primary/10 rounded-lg p-4 text-center">
-                                <i class="fas fa-umbrella-beach text-primary text-2xl mb-2"></i>
-                                <p class="font-medium">Solicitar permisos</p>
-                            </div>
-                            <div class="bg-primary/10 rounded-lg p-4 text-center">
-                                <i class="fas fa-calendar-check text-primary text-2xl mb-2"></i>
-                                <p class="font-medium">Ver días disponibles</p>
-                            </div>
-                            <div class="bg-primary/10 rounded-lg p-4 text-center">
-                                <i class="fas fa-list-check text-primary text-2xl mb-2"></i>
-                                <p class="font-medium">Estado de solicitudes</p>
-                            </div>
-                            <div class="bg-primary/10 rounded-lg p-4 text-center">
-                                <i class="fas fa-book text-primary text-2xl mb-2"></i>
-                                <p class="font-medium">Ver políticas</p>
-                            </div>
-                        </div>
-                        <p class="text-gray-600">¿Qué necesitas hacer hoy?</p>
+                        <p class="text-gray-600">¿En qué más puedo ayudarte hoy?</p>
+                        ${this.getActionButtons()}
                     `;
+                },
+
+                getActionButtons() {
+                    return `
+                        <div class="mt-6 flex justify-center">
+                            <button onclick="window.chatInstance.volverAlMenu()" class="bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
+                                <i class="fas fa-home mr-2"></i>
+                                Volver al menú principal
+                            </button>
+                            </div>
+                    `;
+                },
+
+                volverAlMenu() {
+                    // Limpiar mensajes para mostrar el menú principal
+                    this.messages = [];
+                    this.currentMessage = '';
+                    this.attachedFiles = [];
+                    // Hacer scroll al inicio
+                    this.$nextTick(() => {
+                        const container = this.$refs.chatContainer;
+                        if (container) {
+                            container.scrollTo({
+                                top: 0,
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
                 },
 
                 scrollToBottom() {
@@ -806,6 +1346,362 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                         }
                     });
                 }
+            }
+        }
+
+        // Función para manejar archivos en formularios de licencias
+        window.handleFileSelectLicencia = function(tipo, input) {
+            const files = Array.from(input.files);
+            if (!files || files.length === 0) return;
+
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            
+            files.forEach(file => {
+                // Validar tipo de archivo
+                if (!allowedTypes.includes(file.type)) {
+                    alert(`El archivo "${file.name}" no es un tipo válido. Solo se permiten PDF, JPG, PNG, DOC, DOCX`);
+                    return;
+                }
+                
+                // Validar tamaño
+                if (file.size > maxSize) {
+                    alert(`El archivo "${file.name}" es demasiado grande. El tamaño máximo es 5MB`);
+                    return;
+                }
+                
+                // Mostrar archivo adjunto en el recuadro
+                const archivosDiv = document.getElementById(`archivos-${tipo}`);
+                const archivoDiv = document.createElement('div');
+                archivoDiv.className = 'flex items-center space-x-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2';
+                archivoDiv.innerHTML = `
+                    <i class="fas fa-file text-blue-600"></i>
+                    <span class="text-sm font-medium text-gray-700">${file.name}</span>
+                    <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                archivosDiv.appendChild(archivoDiv);
+                
+                // Guardar referencia al archivo
+                archivoDiv.dataset.fileName = file.name;
+                archivoDiv.dataset.fileSize = file.size;
+                archivoDiv.dataset.fileType = file.type;
+            });
+            
+            // Limpiar input
+            input.value = '';
+        }
+
+        // Función global para procesar permiso médico
+        window.procesarPermisoMedico = function() {
+            const fechaInicio = document.getElementById('fecha-inicio-medico').value;
+            const fechaFin = document.getElementById('fecha-fin-medico').value;
+            
+            if (!fechaInicio || !fechaFin) {
+                alert('Por favor selecciona ambas fechas');
+                return;
+            }
+            
+            if (fechaFin < fechaInicio) {
+                alert('La fecha de fin debe ser posterior a la fecha de inicio');
+                return;
+            }
+            
+            // Formatear fechas para mostrar
+            const fechaInicioFormateada = new Date(fechaInicio).toLocaleDateString('es-CO', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            const fechaFinFormateada = new Date(fechaFin).toLocaleDateString('es-CO', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // Verificar si hay archivos adjuntos
+            const archivosDiv = document.getElementById('archivos-medico');
+            const archivosAdjuntos = archivosDiv.querySelectorAll('div');
+            
+            // Crear array de archivos para el chat
+            const files = [];
+            archivosAdjuntos.forEach(archivoDiv => {
+                if (archivoDiv.dataset.fileName) {
+                    files.push({
+                        name: archivoDiv.dataset.fileName,
+                        size: archivoDiv.dataset.fileSize,
+                        type: archivoDiv.dataset.fileType
+                    });
+                }
+            });
+            
+            // MOSTRAR APROBACIÓN AUTOMÁTICA DIRECTAMENTE (MODO PRUEBA)
+            const chatElement = document.querySelector('[x-data^="premiumChat"]');
+            if (chatElement && chatElement.__x) {
+                const chat = chatElement.__x.$data;
+                const now = new Date();
+                const time = now.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                
+                // Agregar mensaje del usuario
+                chat.messages.push({
+                    type: 'user',
+                    text: `Quiero solicitar permiso médico del ${fechaInicioFormateada} al ${fechaFinFormateada}`,
+                    files: files,
+                    time: time
+                });
+                
+                // Mostrar respuesta de aprobación automática
+                setTimeout(() => {
+                    chat.messages.push({
+                        type: 'bot',
+                        text: `
+                            <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4 my-4">
+                                <p class="flex items-center text-green-800">
+                                    <i class="fas fa-check-circle mr-2"></i>
+                                    <strong>✓ Solicitud de Permiso Médico Aprobada Automáticamente</strong>
+                                </p>
+                                <p class="text-sm text-green-700 mt-2 ml-5">Tu solicitud ha sido procesada exitosamente.</p>
+                            </div>
+                            <p class="text-gray-600">Tu solicitud será revisada y recibirás notificación por correo.</p>
+                            ${chat.getActionButtons()}
+                        `,
+                        time: time
+                    });
+                    chat.scrollToBottom();
+                }, 500);
+            }
+        }
+
+        // Guardar referencia global
+        window.chatInstance = null;
+
+        // Función para calcular días de licencias
+        window.calcularDiasLicencia = function(tipo) {
+            const fechaInicio = document.getElementById(`fecha-inicio-${tipo}`).value;
+            const fechaFin = document.getElementById(`fecha-fin-${tipo}`).value;
+            const diasResultado = document.getElementById(`dias-resultado-${tipo}`);
+            const diasTexto = document.getElementById(`dias-texto-${tipo}`);
+            
+            if (fechaInicio && fechaFin) {
+                const inicio = new Date(fechaInicio);
+                const fin = new Date(fechaFin);
+                const diffTime = Math.abs(fin - inicio);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 para incluir ambos días
+                
+                diasTexto.textContent = `${diffDays} ${diffDays === 1 ? 'día' : 'días'}`;
+                diasResultado.classList.remove('hidden');
+            } else {
+                diasResultado.classList.add('hidden');
+            }
+        }
+
+        // Función global para procesar licencias
+        window.procesarLicencia = function(tipo) {
+            const fechaInicio = document.getElementById(`fecha-inicio-${tipo}`).value;
+            const fechaFin = document.getElementById(`fecha-fin-${tipo}`).value;
+            
+            if (!fechaInicio || !fechaFin) {
+                alert('Por favor selecciona ambas fechas');
+                return;
+            }
+            
+            if (fechaFin < fechaInicio) {
+                alert('La fecha de fin debe ser posterior a la fecha de inicio');
+                return;
+            }
+            
+            // Formatear fechas para mostrar
+            const fechaInicioFormateada = new Date(fechaInicio).toLocaleDateString('es-CO', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            const fechaFinFormateada = new Date(fechaFin).toLocaleDateString('es-CO', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            let tipoTexto = '';
+            let tipoTextoMensaje = '';
+            
+            if (tipo === 'paternidad') {
+                tipoTexto = 'licencia de paternidad';
+                tipoTextoMensaje = 'Licencia de Paternidad';
+            } else if (tipo === 'maternidad') {
+                tipoTexto = 'licencia de maternidad';
+                tipoTextoMensaje = 'Licencia de Maternidad';
+            } else if (tipo === 'muerte') {
+                tipoTexto = 'permiso por muerte de familiar';
+                tipoTextoMensaje = 'Permiso por Muerte de Familiar';
+            } else if (tipo === 'jurado') {
+                tipoTexto = 'permiso por miembro/jurado';
+                tipoTextoMensaje = 'Permiso por Miembro/Jurado';
+            }
+            
+            // Verificar si hay archivos adjuntos (manejo especial para muerte)
+            let files = [];
+            if (tipo === 'muerte') {
+                // Recopilar archivos de defunción
+                const archivosDefuncion = document.getElementById('archivos-defuncion');
+                if (archivosDefuncion) {
+                    archivosDefuncion.querySelectorAll('div').forEach(archivoDiv => {
+                        if (archivoDiv.dataset.fileName) {
+                            files.push({
+                                name: 'Defunción: ' + archivoDiv.dataset.fileName,
+                                size: archivoDiv.dataset.fileSize,
+                                type: archivoDiv.dataset.fileType
+                            });
+                        }
+                    });
+                }
+                // Recopilar archivos de parentesco
+                const archivosParentesco = document.getElementById('archivos-parentesco');
+                if (archivosParentesco) {
+                    archivosParentesco.querySelectorAll('div').forEach(archivoDiv => {
+                        if (archivoDiv.dataset.fileName) {
+                            files.push({
+                                name: 'Parentesco: ' + archivoDiv.dataset.fileName,
+                                size: archivoDiv.dataset.fileSize,
+                                type: archivoDiv.dataset.fileType
+                            });
+                        }
+                    });
+                }
+            } else {
+                // Recopilar archivos normales para otros tipos
+                const archivosDiv = document.getElementById(`archivos-${tipo}`);
+                if (archivosDiv) {
+                    archivosDiv.querySelectorAll('div').forEach(archivoDiv => {
+                        if (archivoDiv.dataset.fileName) {
+                            files.push({
+                                name: archivoDiv.dataset.fileName,
+                                size: archivoDiv.dataset.fileSize,
+                                type: archivoDiv.dataset.fileType
+                            });
+                        }
+                    });
+                }
+            }
+            
+            // MOSTRAR APROBACIÓN AUTOMÁTICA DIRECTAMENTE (MODO PRUEBA)
+            const chatElement = document.querySelector('[x-data^="premiumChat"]');
+            if (chatElement && chatElement.__x) {
+                const chat = chatElement.__x.$data;
+                const now = new Date();
+                const time = now.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                
+                // Agregar mensaje del usuario
+                chat.messages.push({
+                    type: 'user',
+                    text: `Solicitud de ${tipoTexto} del ${fechaInicioFormateada} al ${fechaFinFormateada}`,
+                    files: files,
+                    time: time
+                });
+                
+                // Mostrar respuesta de aprobación automática
+                setTimeout(() => {
+                    chat.messages.push({
+                        type: 'bot',
+                        text: `
+                            <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4 my-4">
+                                <p class="flex items-center text-green-800">
+                                    <i class="fas fa-check-circle mr-2"></i>
+                                    <strong>✓ Solicitud de ${tipoTextoMensaje} Aprobada Automáticamente</strong>
+                                </p>
+                                <p class="text-sm text-green-700 mt-2 ml-5">Tu solicitud ha sido procesada exitosamente.</p>
+                            </div>
+                            <p class="text-gray-600">Tu solicitud será revisada y recibirás notificación por correo.${tipo === 'muerte' ? ' Recuerda adjuntar ambos certificados.' : tipo !== 'muerte' ? ' Recuerda adjuntar el certificado.' : ''}</p>
+                            ${chat.getActionButtons()}
+                        `,
+                        time: time
+                    });
+                    chat.scrollToBottom();
+                }, 500);
+            }
+        }
+
+        // Función para calcular días de vacaciones
+        window.calcularDiasVacaciones = function() {
+            const fechaInicio = document.getElementById('fecha-inicio').value;
+            const fechaFin = document.getElementById('fecha-fin').value;
+            const diasResultado = document.getElementById('dias-resultado');
+            const diasTexto = document.getElementById('dias-texto');
+            
+            if (fechaInicio && fechaFin) {
+                const inicio = new Date(fechaInicio);
+                const fin = new Date(fechaFin);
+                const diffTime = Math.abs(fin - inicio);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 para incluir ambos días
+                
+                diasTexto.textContent = `${diffDays} ${diffDays === 1 ? 'día' : 'días'}`;
+                diasResultado.classList.remove('hidden');
+            } else {
+                diasResultado.classList.add('hidden');
+            }
+        }
+
+        // Función global para procesar vacaciones
+        window.procesarVacaciones = function() {
+            const fechaInicio = document.getElementById('fecha-inicio').value;
+            const fechaFin = document.getElementById('fecha-fin').value;
+            
+            if (!fechaInicio || !fechaFin) {
+                alert('Por favor selecciona ambas fechas');
+                return;
+            }
+            
+            if (fechaFin < fechaInicio) {
+                alert('La fecha de fin debe ser posterior a la fecha de inicio');
+                return;
+            }
+            
+            // Formatear fechas para mostrar
+            const fechaInicioFormateada = new Date(fechaInicio).toLocaleDateString('es-CO', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            const fechaFinFormateada = new Date(fechaFin).toLocaleDateString('es-CO', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // MOSTRAR APROBACIÓN AUTOMÁTICA DIRECTAMENTE (MODO PRUEBA)
+            const chatElement = document.querySelector('[x-data^="premiumChat"]');
+            if (chatElement && chatElement.__x) {
+                const chat = chatElement.__x.$data;
+                const now = new Date();
+                const time = now.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                
+                // Agregar mensaje del usuario
+                chat.messages.push({
+                    type: 'user',
+                    text: `Quiero vacaciones del ${fechaInicioFormateada} al ${fechaFinFormateada}`,
+                    time: time
+                });
+                
+                // Mostrar respuesta de aprobación automática
+                setTimeout(() => {
+                    chat.messages.push({
+                        type: 'bot',
+                        text: `
+                            <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-4 my-4">
+                                <p class="flex items-center text-green-800">
+                                    <i class="fas fa-check-circle mr-2"></i>
+                                    <strong>✓ Solicitud de Vacaciones Aprobada Automáticamente</strong>
+                                </p>
+                                <p class="text-sm text-green-700 mt-2 ml-5">Tu solicitud ha sido procesada exitosamente.</p>
+                            </div>
+                            <p class="text-gray-600">Tu solicitud de vacaciones será revisada y recibirás notificación por correo.</p>
+                            ${chat.getActionButtons()}
+                        `,
+                        time: time
+                    });
+                    chat.scrollToBottom();
+                }, 500);
             }
         }
     </script>
