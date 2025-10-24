@@ -8,6 +8,12 @@ requireLogin();
 // Obtener datos del usuario actual
 $usuario = getCurrentUser();
 
+// Redirigir empleados a su dashboard específico
+if ($usuario['rol'] === 'empleado') {
+    header('Location: empleado_dashboard.php');
+    exit;
+}
+
 // Si no hay avatar, usar uno por defecto
 if (empty($usuario['avatar'])) {
     $usuario['avatar'] = 'https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100&q=80';
@@ -345,13 +351,18 @@ include __DIR__ . '/../includes/header.php';
 <script>
 // Preparar datos del calendario para JavaScript
 window.calendarEvents = [
-    <?php foreach ($eventos_calendario as $evento): ?>
+    <?php
+    $total = count($eventos_calendario);
+    $count = 0;
+    foreach ($eventos_calendario as $evento):
+        $count++;
+    ?>
     {
         title: '<?= addslashes($evento['titulo']) ?>',
         start: '<?= $evento['fecha'] ?>',
         color: '<?= $evento['tipo'] == 'vacaciones' ? '#0B8A3A' : ($evento['tipo'] == 'permiso' ? '#FFD400' : ($evento['tipo'] == 'reunion' ? '#3B82F6' : '#8B5CF6')) ?>',
         textColor: '<?= $evento['tipo'] == 'vacaciones' ? 'white' : 'black' ?>'
-    },
+    }<?= $count < $total ? ',' : '' ?>
     <?php endforeach; ?>
 ];
 </script>
