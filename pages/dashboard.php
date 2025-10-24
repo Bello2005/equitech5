@@ -82,10 +82,52 @@ try {
         }
         if (!empty($actividad_db)) $actividad_reciente = $actividad_db;
     }
-
     $conn->close();
 } catch (Exception $e) {
     // Mantener datos mock si falla la consulta
+}
+
+// Asegurar que la tabla `job_types` exista y tenga 4 tipos por defecto (idempotente)
+try {
+    require_once __DIR__ . '/../config/database.php';
+    $conn = getConnection();
+
+    $createSql = "CREATE TABLE IF NOT EXISTS job_types (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nombre VARCHAR(255) NOT NULL,
+        descripcion TEXT NULL,
+        fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        fecha_actualizacion DATETIME NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+    $conn->query($createSql);
+
+    $res = $conn->query("SELECT COUNT(*) AS cnt FROM job_types");
+    $cnt = 0;
+    if ($res) {
+        $r = $res->fetch_assoc();
+        $cnt = (int)$r['cnt'];
+    }
+
+    if ($cnt === 0) {
+        $stmt = $conn->prepare("INSERT INTO job_types (nombre, descripcion, fecha_creacion) VALUES (?, ?, NOW())");
+        if ($stmt) {
+            $defaults = [
+                ['Tiempo Completo', 'Empleado a tiempo completo'],
+                ['Medio Tiempo', 'Empleado a medio tiempo'],
+                ['Contrato', 'Empleado por contrato'],
+                ['Practicante', 'Estudiante en práctica']
+            ];
+            foreach ($defaults as $d) {
+                $stmt->bind_param('ss', $d[0], $d[1]);
+                $stmt->execute();
+            }
+            $stmt->close();
+        }
+    }
+
+    $conn->close();
+} catch (Exception $e) {
+    // No interrumpir si falla; la UI seguirá funcionando con llamada al endpoint que devolverá vacío
 }
 ?>
 
@@ -476,6 +518,24 @@ try {
                                     </button>
                                 </div>
                             </div>
+                        
+                        <!-- Quick Forms: Empleado y Tipos de Empleo -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <div class="px-6 py-5 border-b border-gray-100">
+                                <h3 class="text-xl font-semibold text-gray-900">Formularios Rápidos</h3>
+                            </div>
+                            <div class="p-6 space-y-4">
+                                <p class="text-sm text-gray-600">Crear rápidamente un empleado o gestionar los tipos de empleo.</p>
+                                <div class="flex space-x-3">
+                                    <button id="btn-open-employee-form" class="flex-1 inline-flex items-center justify-center px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark">
+                                        <i class="fas fa-user-plus mr-2"></i> Nuevo Empleado
+                                    </button>
+                                    <button id="btn-open-jobtypes" class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-xl hover:bg-gray-50">
+                                        <i class="fas fa-briefcase mr-2"></i> Tipos de Empleo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                         </div>
                     </div>
                 </div>

@@ -28,15 +28,31 @@ try {
     // Verificar la acción solicitada
     switch ($input['action'] ?? '') {
         case 'create':
-            // Validar datos requeridos
-            if (empty($input['nombre']) || empty($input['email']) || empty($input['rol']) || empty($input['departamento_id'])) {
-                throw new Exception('Faltan datos requeridos');
+            // Validar datos requeridos (departamento y job_type son opcionales)
+            if (empty($input['nombre']) || empty($input['email']) || empty($input['rol'])) {
+                throw new Exception('Faltan datos requeridos: nombre, email y rol');
             }
-            
-            $sql = "INSERT INTO usuarios (nombre, email, rol, departamento_id, estado, fecha_creacion) VALUES (?, ?, ?, ?, 'activo', NOW())";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param('sssi', $input['nombre'], $input['email'], $input['rol'], $input['departamento_id']);
-            
+
+            // Detectar si la columna job_type_id existe en la tabla usuarios
+            $hasJobType = false;
+            $resCheck = $conn->query("SHOW COLUMNS FROM usuarios LIKE 'job_type_id'");
+            if ($resCheck && $resCheck->num_rows > 0) $hasJobType = true;
+
+            // Preparar valores opcionales
+            $departamento_id = isset($input['departamento_id']) && $input['departamento_id'] ? $input['departamento_id'] : null;
+            $job_type_id = isset($input['job_type_id']) && $input['job_type_id'] ? $input['job_type_id'] : null;
+
+            if ($hasJobType) {
+                $sql = "INSERT INTO usuarios (nombre, email, rol, departamento_id, job_type_id, estado, fecha_creacion) VALUES (?, ?, ?, ?, ?, 'activo', NOW())";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param('sssii', $input['nombre'], $input['email'], $input['rol'], $departamento_id, $job_type_id);
+            } else {
+                // Si no existe job_type_id, insertamos sin esa columna
+                $sql = "INSERT INTO usuarios (nombre, email, rol, departamento_id, estado, fecha_creacion) VALUES (?, ?, ?, ?, 'activo', NOW())";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param('sssi', $input['nombre'], $input['email'], $input['rol'], $departamento_id);
+            }
+
             if ($stmt->execute()) {
                 $response = ['success' => true, 'id' => $conn->insert_id];
             } else {
@@ -49,11 +65,25 @@ try {
             if (empty($input['id'])) {
                 throw new Exception('ID de empleado no proporcionado');
             }
-            
-            $sql = "UPDATE usuarios SET nombre = ?, email = ?, rol = ?, departamento_id = ?, telefono = ?, fecha_actualizacion = NOW() WHERE id = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param('sssisi', $input['nombre'], $input['email'], $input['rol'], $input['departamento_id'], $input['telefono'], $input['id']);
-            
+
+            // Detectar si la columna job_type_id existe
+            $hasJobType = false;
+            $resCheck = $conn->query("SHOW COLUMNS FROM usuarios LIKE 'job_type_id'");
+            if ($resCheck && $resCheck->num_rows > 0) $hasJobType = true;
+
+            $departamento_id = isset($input['departamento_id']) && $input['departamento_id'] ? $input['departamento_id'] : null;
+            $job_type_id = isset($input['job_type_id']) && $input['job_type_id'] ? $input['job_type_id'] : null;
+
+            if ($hasJobType) {
+                $sql = "UPDATE usuarios SET nombre = ?, email = ?, rol = ?, departamento_id = ?, telefono = ?, job_type_id = ?, fecha_actualizacion = NOW() WHERE id = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param('sssiiii', $input['nombre'], $input['email'], $input['rol'], $departamento_id, $input['telefono'], $job_type_id, $input['id']);
+            } else {
+                $sql = "UPDATE usuarios SET nombre = ?, email = ?, rol = ?, departamento_id = ?, telefono = ?, fecha_actualizacion = NOW() WHERE id = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param('sssisi', $input['nombre'], $input['email'], $input['rol'], $departamento_id, $input['telefono'], $input['id']);
+            }
+
             if ($stmt->execute()) {
                 $response = ['success' => true];
             } else {
