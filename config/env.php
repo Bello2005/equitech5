@@ -154,7 +154,13 @@ function env($key, $default = null) {
 try {
     Env::load();
 } catch (Exception $e) {
-    error_log("Error cargando .env: " . $e->getMessage());
-    die("Error de configuración. Por favor contacte al administrador.");
+    // En desarrollo, usar valores por defecto si no existe .env
+    if (strpos($e->getMessage(), 'no encontrado') !== false) {
+        error_log("ADVERTENCIA: Archivo .env no encontrado. Usando valores por defecto.");
+        // No hacer nada, las funciones env() usarán valores por defecto
+    } else {
+        error_log("Error cargando .env: " . $e->getMessage());
+        die("Error de configuración. Por favor contacte al administrador.");
+    }
 }
 ?>

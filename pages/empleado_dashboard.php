@@ -7,10 +7,10 @@ requireLogin();
 // Obtener datos del usuario actual
 $usuario = getCurrentUser();
 
-// Verificar que sea empleado
-if ($usuario['rol'] !== 'empleado') {
-    header('Location: dashboard.php');
-    exit;
+// Si no tiene rol, asignar empleado por defecto
+if (empty($usuario['rol'])) {
+    $_SESSION['user_role'] = 'empleado';
+    $usuario['rol'] = 'empleado';
 }
 
 // Si no hay avatar, usar uno por defecto

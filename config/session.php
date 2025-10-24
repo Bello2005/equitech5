@@ -32,7 +32,7 @@ function isLoggedIn() {
 // Función para requerir autenticación
 function requireLogin() {
     if (!isLoggedIn()) {
-        $app_url = env('APP_URL', '/Comfachoco');
+        $app_url = env('APP_URL', '/equitech5');
         header("Location: {$app_url}/index.php");
         exit();
     }
@@ -71,7 +71,7 @@ function logout() {
     // Destruir la sesión
     session_destroy();
 
-    $app_url = env('APP_URL', '/Comfachoco');
+    $app_url = env('APP_URL', '/equitech5');
     header("Location: {$app_url}/index.php");
     exit();
 }

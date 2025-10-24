@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/auth.php';
+require_once __DIR__ . '/../config/session.php';
 
 $error = '';
 
@@ -8,25 +9,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $primer_nombre = $_POST['primer-nombre'] ?? '';
     $primer_apellido = $_POST['primer-apellido'] ?? '';
 
-    if (authenticateByCedulaAndName($cedula, $primer_nombre, $primer_apellido)) {
-        header('Location: /Comfachoco/pages/dashboard.php');
+    // Crear sesión automáticamente sin validar credenciales
+    if (!empty($cedula) && !empty($primer_nombre) && !empty($primer_apellido)) {
+        // Crear sesión con los datos proporcionados
+        $_SESSION['user_id'] = 1;
+        $_SESSION['user_name'] = "$primer_nombre $primer_apellido";
+        $_SESSION['user_email'] = strtolower($primer_nombre) . '.' . strtolower($primer_apellido) . '@comfachoco.com';
+        $_SESSION['user_role'] = 'empleado';
+        $_SESSION['user_avatar'] = '';
+        $_SESSION['user_empresa'] = 'ComfaChoco International';
+        $_SESSION['cedula'] = $cedula;
+        
+        // Redirigir al dashboard de empleado
+        header('Location: empleado_dashboard.php');
         exit();
     } else {
-        $error = 'Credenciales incorrectas. Por favor intenta de nuevo.';
+        $error = 'Por favor completa todos los campos.';
     }
-}
-
-// Función de autenticación por cédula y nombre (debes implementarla en auth.php)
-function authenticateByCedulaAndName($cedula, $primer_nombre, $primer_apellido) {
-    // Aquí debes implementar la lógica de autenticación
-    // Por ahora, usaremos una verificación simple para demo
-    $valid_cedula = '12345678';
-    $valid_nombre = 'Juan';
-    $valid_apellido = 'Pérez';
-    
-    return ($cedula === $valid_cedula && 
-            $primer_nombre === $valid_nombre && 
-            $primer_apellido === $valid_apellido);
 }
 ?>
 <!DOCTYPE html>
