@@ -8,7 +8,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
 
     if (authenticate($email, $password)) {
-        header('Location: /comfachoco/pages/dashboard.php');
+        // Redirigir al dashboard usando la ruta correcta
+        header('Location: /Comfachoco/pages/dashboard.php');
         exit();
     } else {
         $error = 'Credenciales incorrectas. Por favor intenta de nuevo.';

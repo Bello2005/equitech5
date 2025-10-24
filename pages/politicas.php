@@ -14,30 +14,61 @@ include __DIR__ . '/../includes/head.php';
 include __DIR__ . '/../includes/sidebar.php';
 include __DIR__ . '/../includes/header.php';
 
-// Intentar cargar políticas desde la base de datos
+// Intentar cargar políticas y estadísticas desde la base de datos
+$politicas = [];
+$stats = [
+    'total' => 0,
+    'por_categoria' => []
+];
+
 try {
     $conn = getConnection();
-    $sql = "SELECT id, nombre, categoria, descripcion, fecha_creacion, fecha_actualizacion FROM politicas ORDER BY categoria, nombre";
+
+    // Cargar políticas
+    $sql = "SELECT id, nombre, categoria, descripcion, aplicable_a, activo, fecha_creacion, fecha_actualizacion
+            FROM politicas
+            WHERE activo = 1
+            ORDER BY categoria, nombre";
     $result = $conn->query($sql);
-    $politicas = [];
     if ($result) {
         while ($row = $result->fetch_assoc()) {
             $politicas[] = $row;
         }
     }
+
+    // Calcular estadísticas
+    $stats['total'] = count($politicas);
+    foreach ($politicas as $pol) {
+        $cat = $pol['categoria'];
+        if (!isset($stats['por_categoria'][$cat])) {
+            $stats['por_categoria'][$cat] = 0;
+        }
+        $stats['por_categoria'][$cat]++;
+    }
+
     $conn->close();
 } catch (Exception $e) {
+    error_log("Error cargando políticas: " . $e->getMessage());
     // Si falla la base de datos, usar políticas por defecto
     $politicas = [
         ['id' => 1, 'nombre' => 'Permiso de Vacaciones', 'categoria' => 'vacaciones',
-         'descripcion' => 'Permiso de vacaciones: 15 días hábiles por periodo de un año.'],
+         'descripcion' => 'Permiso de vacaciones: 15 días hábiles por periodo de un año.',
+         'aplicable_a' => 'todos', 'activo' => 1, 'fecha_creacion' => date('Y-m-d H:i:s'),
+         'fecha_actualizacion' => date('Y-m-d H:i:s')],
         ['id' => 2, 'nombre' => 'Permiso de Maternidad/Paternidad', 'categoria' => 'permisos',
-         'descripcion' => 'Permiso maternidad o paternidad: mujeres 4 meses, hombres 15 días.'],
+         'descripcion' => 'Permiso maternidad o paternidad: mujeres 4 meses, hombres 15 días.',
+         'aplicable_a' => 'todos', 'activo' => 1, 'fecha_creacion' => date('Y-m-d H:i:s'),
+         'fecha_actualizacion' => date('Y-m-d H:i:s')],
         ['id' => 3, 'nombre' => 'Permisos Médicos', 'categoria' => 'permisos',
-         'descripcion' => 'Permisos médicos (deben estar acompañados de las órdenes médicas, todo anexo que tenga que ver con la enfermedad).'],
+         'descripcion' => 'Permisos médicos (deben estar acompañados de las órdenes médicas, todo anexo que tenga que ver con la enfermedad).',
+         'aplicable_a' => 'todos', 'activo' => 1, 'fecha_creacion' => date('Y-m-d H:i:s'),
+         'fecha_actualizacion' => date('Y-m-d H:i:s')],
         ['id' => 4, 'nombre' => 'Permiso por Servicio como Jurado', 'categoria' => 'permisos',
-         'descripcion' => 'Permiso por ser miembro o jurado.'],
+         'descripcion' => 'Permiso por ser miembro o jurado.',
+         'aplicable_a' => 'todos', 'activo' => 1, 'fecha_creacion' => date('Y-m-d H:i:s'),
+         'fecha_actualizacion' => date('Y-m-d H:i:s')],
     ];
+    $stats['total'] = count($politicas);
 }
 ?>
 
@@ -46,15 +77,84 @@ try {
         <!-- Encabezado -->
         <div class="mb-8">
             <div class="flex items-center justify-between">
-                <h1 class="text-3xl font-bold text-gray-900">Políticas Corporativas</h1>
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Políticas Corporativas</h1>
+                    <p class="mt-2 text-sm text-gray-700">
+                        Gestión y consulta de políticas corporativas
+                    </p>
+                </div>
                 <button id="btn-nueva-politica" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                     <i class="fas fa-plus mr-2"></i>
                     Nueva Política
                 </button>
             </div>
-            <p class="mt-2 text-sm text-gray-700">
-                Gestión y consulta de políticas corporativas
-            </p>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-book text-3xl text-gray-400"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total Políticas</dt>
+                                <dd class="text-2xl font-bold text-gray-900"><?= $stats['total'] ?></dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-umbrella-beach text-3xl text-green-400"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Vacaciones</dt>
+                                <dd class="text-2xl font-bold text-gray-900"><?= $stats['por_categoria']['vacaciones'] ?? 0 ?></dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-calendar-check text-3xl text-blue-400"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Permisos</dt>
+                                <dd class="text-2xl font-bold text-gray-900"><?= $stats['por_categoria']['permisos'] ?? 0 ?></dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-laptop-house text-3xl text-purple-400"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Teletrabajo</dt>
+                                <dd class="text-2xl font-bold text-gray-900"><?= $stats['por_categoria']['teletrabajo'] ?? 0 ?></dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Grid de políticas -->

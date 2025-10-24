@@ -8,11 +8,17 @@ define('DB_PORT', env('DB_PORT', 3306));
 define('DB_USER', env('DB_USER', 'root'));
 define('DB_PASS', env('DB_PASS', ''));
 define('DB_NAME', env('DB_NAME', 'comfachoco'));
+define('DB_SOCKET', env('DB_SOCKET', '/opt/lampp/var/mysql/mysql.sock'));
 
 // Crear conexión
 function getConnection() {
     try {
-        $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
+        // Usar socket de XAMPP/LAMPP si el host es localhost
+        if (DB_HOST === 'localhost' || DB_HOST === '127.0.0.1') {
+            $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT, DB_SOCKET);
+        } else {
+            $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT);
+        }
 
         if ($conn->connect_error) {
             throw new Exception("Error de conexión: {$conn->connect_error}");
