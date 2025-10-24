@@ -83,8 +83,9 @@
                                 <button @click="userMenuOpen = !userMenuOpen"
                                         class="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100/50 transition-colors">
                                     <img class="w-8 h-8 rounded-xl object-cover"
-                                         src="<?= $usuario['avatar'] ?>"
-                                         alt="<?= $usuario['nombre'] ?>">
+                                         src="<?= htmlspecialchars($usuario['avatar'] ?? '') ?>"
+                                         alt="<?= htmlspecialchars($usuario['nombre'] ?? '') ?>"
+                                         onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($usuario['nombre'] ?? 'User') ?>&background=0B8A3A&color=fff&size=128'">
                                     <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
                                 </button>
 

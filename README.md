@@ -83,7 +83,7 @@ APP_KEY=base64:Jx8K9mN3pQ7rT5vW2yZ4bC6dF8gH0jL3nM5oP7qS9tU1
 HASH_ALGORITHM=bcrypt
 
 # Configuración de Zona Horaria
-TIMEZONE=America/Bogota
+TIMEZONE=-05:00              # Colombia UTC-5 (usar formato offset para MySQL)
 ```
 
 **IMPORTANTE**:
@@ -213,11 +213,71 @@ Agregar tus scripts en `assets/js/` e incluirlos en `includes/footer.php`
 
 ## Seguridad
 
-- ✅ Contraseñas hasheadas con `password_hash()`
-- ✅ Consultas preparadas (prepared statements) para prevenir SQL injection
-- ✅ Validación de sesiones
-- ✅ Protección contra acceso no autorizado
-- ⚠️  **IMPORTANTE**: Cambiar las credenciales por defecto en producción
+### Características de Seguridad Implementadas
+
+- ✅ **Variables de entorno (.env)**: Credenciales y configuraciones sensibles fuera del código
+- ✅ **Contraseñas hasheadas**: Uso de `password_hash()` con algoritmo bcrypt
+- ✅ **Consultas preparadas**: Prepared statements para prevenir SQL injection
+- ✅ **Sesiones seguras**:
+  - HttpOnly cookies para prevenir XSS
+  - Regeneración periódica de ID de sesión
+  - Configuración de tiempo de vida de sesión
+  - SameSite cookie policy
+- ✅ **Validación de autenticación**: Protección de rutas con `requireLogin()`
+- ✅ **.gitignore**: Archivo .env excluido del control de versiones
+- ✅ **Manejo de errores**: Mensajes diferentes según ambiente (desarrollo/producción)
+
+### Recomendaciones para Producción
+
+⚠️ **IMPORTANTE antes de desplegar a producción**:
+
+1. **Variables de entorno**:
+   ```env
+   APP_ENV=production
+   APP_DEBUG=false
+   SESSION_SECURE=true  # Solo si usas HTTPS
+   ```
+
+2. **Cambiar credenciales**:
+   - Cambiar contraseñas por defecto de usuarios
+   - Generar nuevo `APP_KEY` único
+   - Usar contraseña fuerte para MySQL
+
+3. **HTTPS**:
+   - Habilitar SSL/TLS
+   - Activar `SESSION_SECURE=true`
+   - Forzar HTTPS en Apache/Nginx
+
+4. **Permisos de archivos**:
+   ```bash
+   chmod 644 .env
+   chmod 755 pages/
+   chmod 755 config/
+   ```
+
+5. **Ocultar información del servidor**:
+   - Desactivar `display_errors` en php.ini
+   - Ocultar versión de PHP
+   - Configurar CSP headers
+
+6. **Backups regulares**:
+   - Base de datos
+   - Archivos del proyecto
+   - Variables de entorno
+
+### Generar APP_KEY Seguro
+
+Puedes generar un APP_KEY seguro con:
+
+```bash
+php -r "echo 'base64:' . base64_encode(random_bytes(32)) . PHP_EOL;"
+```
+
+O usando OpenSSL:
+
+```bash
+openssl rand -base64 32
+```
 
 ## TODO / Próximas Mejoras
 

@@ -15,9 +15,9 @@
                 <!-- Logo section -->
                 <div class="flex items-center justify-between p-6 border-b border-gray-100">
                     <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center shadow-elegant">
-                            <span class="text-white font-bold text-lg">C</span>
-                        </div>
+                        <img src="../assets/images/logo-comfachoco-no-lema.svg"
+                             alt="ComfaChoco Logo"
+                             class="h-10 w-auto">
                         <div>
                             <h1 class="text-xl font-bold text-gray-900">ComfaChoco</h1>
                             <p class="text-xs text-gray-500">International</p>
@@ -33,13 +33,14 @@
                     <div class="flex items-center space-x-4">
                         <div class="relative">
                             <img class="w-12 h-12 rounded-2xl object-cover border-2 border-white shadow-md"
-                                 src="<?= $usuario['avatar'] ?>"
-                                 alt="<?= $usuario['nombre'] ?>">
+                                 src="<?= htmlspecialchars($usuario['avatar'] ?? '') ?>"
+                                 alt="<?= htmlspecialchars($usuario['nombre'] ?? '') ?>"
+                                 onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($usuario['nombre'] ?? 'User') ?>&background=0B8A3A&color=fff&size=128'">
                             <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full"></div>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-gray-900 truncate"><?= $usuario['nombre'] ?></p>
-                            <p class="text-xs text-gray-500 truncate"><?= $usuario['rol'] ?></p>
+                            <p class="text-sm font-semibold text-gray-900 truncate"><?= htmlspecialchars($usuario['nombre'] ?? '') ?></p>
+                            <p class="text-xs text-gray-500 truncate"><?= htmlspecialchars($usuario['rol'] ?? '') ?></p>
                         </div>
                     </div>
                 </div>
