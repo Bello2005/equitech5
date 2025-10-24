@@ -1,0 +1,21 @@
+.badge-pendiente {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    color: #92400E;
+    border: 1px solid #FCD34D;
+}
+
+.badge-aprobado {
+    background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+    color: #065F46;
+    border: 1px solid #34D399;
+}
+
+.badge-rechazado {
+    background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+    color: #991B1B;
+    border: 1px solid #F87171;
+}
+
+.priority-alta { border-left: 4px solid #EF4444; }
+.priority-media { border-left: 4px solid #F59E0B; }
+.priority-baja { border-left: 4px solid #10B981; }

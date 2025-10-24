@@ -1,0 +1,10 @@
+:root {
+    --primary: #0B8A3A;
+    --primary-dark: #00582A;
+    --accent: #FFD400;
+    --accent-dark: #E6BF00;
+}
+
+* {
+    font-family: 'Inter', system-ui, sans-serif;
+}
