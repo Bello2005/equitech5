@@ -323,7 +323,7 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                         ¡Hola <?= htmlspecialchars($primer_nombre) ?>! 👋
                                     </h2>
                                     <p class="text-lg md:text-xl text-gray-600 mb-2">
-                                        Soy el asistente de ComfaChoco. Estoy aquí para ayudarte con tus permisos y vacaciones de forma sencilla.
+                                        Soy el asistente de ComfaChocó. Estoy aquí para ayudarte con tus permisos y vacaciones de forma sencilla.
                                     </p>
                                     <p class="text-lg text-gray-700">
                                         Tienes <span class="text-primary font-semibold text-2xl">15 días</span> de vacaciones disponibles.
@@ -1250,6 +1250,20 @@ $page_title = 'Asistente Virtual - ComfaChoco';
         html.dark-mode .fixed .bg-white {
             background: #0f0f0f !important;
             border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        /* Texto del panel de accesibilidad en modo oscuro */
+        html.dark-mode .fixed .bg-white .text-gray-900,
+        html.dark-mode .fixed .bg-white .text-gray-700,
+        html.dark-mode .fixed .bg-white .text-gray-600,
+        html.dark-mode .fixed .bg-white .text-gray-500 {
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .fixed .bg-white p,
+        html.dark-mode .fixed .bg-white span,
+        html.dark-mode .fixed .bg-white h3 {
+            color: #ffffff !important;
         }
 
         /* Panel de accesibilidad en modo oscuro + alto contraste */
