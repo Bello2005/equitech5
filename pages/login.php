@@ -397,8 +397,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <img src="../assets/images/logo-comfachoco-no-lema.svg"
                          alt="ComfaChoco Logo"
                          class="h-16 w-auto mx-auto mb-4">
-                    <h3>ComfaChoco International</h3>
-                    <p>Sistema de Gestión de Recursos Humanos</p>
+                    <h3>Sistema de gestión de permisos y licencias.</h3>
+                <p>Ingresa tus datos para acceder</p>
+
                 </div>
                 
                 <?php if ($error): ?>

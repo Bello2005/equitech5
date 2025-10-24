@@ -15,13 +15,18 @@ if (empty($usuario['rol'])) {
 
 // Si no hay avatar, usar uno por defecto
 if (empty($usuario['avatar'])) {
-    $usuario['avatar'] = 'https://ui-avatars.com/api/?name=' . urlencode($usuario['nombre']) . '&background=0B8A3A&color=fff&size=128';
+    $usuario['avatar'] = 'https://ui-avatars.com/api/?name+=' . urlencode($usuario['nombre']) . '&background=0B8A3A&color=fff&size=128';
 }
 
 // Obtener iniciales del nombre
 $nombre_partes = explode(' ', $usuario['nombre']);
 $usuario['iniciales'] = substr($nombre_partes[0], 0, 1) . (isset($nombre_partes[1]) ? substr($nombre_partes[1], 0, 1) : '');
 $primer_nombre = $nombre_partes[0];
+
+// Detectar género por nombre (solo para íconos)
+$nombres_mujer = ['maria', 'ana', 'laura', 'mayra', 'sandra', 'patricia', 'carolina', 'carmen', 'diana', 'natalia', 'juliana', 'paula', 'andrea', 'valentina', 'camila', 'sofia', 'isabella', 'mariana', 'daniela', 'valeria'];
+$primer_nombre_lower = strtolower($primer_nombre);
+$es_mujer = in_array($primer_nombre_lower, $nombres_mujer);
 
 $page_title = 'Asistente Virtual - ComfaChoco';
 ?>
@@ -258,8 +263,8 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                     <!-- Logo y título -->
                     <div class="flex items-center space-x-4">
                         <div class="relative">
-                            <div class="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
-                                <i class="fas fa-robot text-white text-2xl"></i>
+                            <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-lg border-2 border-gray-100 dark-mode-logo">
+                                <img src="../assets/images/logo-comfachoco-no-lema.svg" alt="ComfaChocó Logo" class="w-10 h-10 object-contain">
                             </div>
                             <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-3 border-white status-badge"></div>
                         </div>
@@ -267,7 +272,7 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                             <h1 class="text-xl md:text-2xl font-bold text-gray-900">Asistente Permisos ComfaChocó</h1>
                             <p class="text-sm text-gray-500 mt-0.5 flex items-center">
                                 <span class="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-                                Siempre disponible para ayudarte
+                                Siempre disponible para ayudarte.
                             </p>
                         </div>
                     </div>
@@ -278,9 +283,13 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                             <p class="text-sm font-semibold text-gray-900"><?= htmlspecialchars($primer_nombre) ?></p>
                             <p class="text-xs text-gray-500">Empleado</p>
                         </div>
-                        <img src="<?= htmlspecialchars($usuario['avatar']) ?>"
-                             alt="<?= htmlspecialchars($usuario['nombre']) ?>"
-                             class="w-12 h-12 rounded-xl object-cover ring-2 ring-primary/20 shadow-md">
+                        <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white text-xl shadow-md ring-2 ring-primary/20">
+                            <?php if ($es_mujer): ?>
+                                <i class="fas fa-user-circle"></i>
+                            <?php else: ?>
+                                <i class="fas fa-user"></i>
+                            <?php endif; ?>
+                        </div>
                         <a href="../config/logout.php"
                            class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 transition-all duration-300"
                            title="Cerrar sesión">
@@ -296,7 +305,7 @@ $page_title = 'Asistente Virtual - ComfaChoco';
             </div>
 
             <!-- Chat Area -->
-            <div class="flex-1 overflow-y-auto chat-scroll bg-white/50" x-ref="chatContainer">
+            <div class="flex-1 overflow-y-auto chat-scroll bg-transparent" x-ref="chatContainer">
                 <div class="max-w-7xl mx-auto px-4 md:px-8 py-6">
 
                     <!-- Welcome Screen -->
@@ -304,8 +313,10 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                         <!-- Saludo -->
                         <div class="max-w-4xl mx-auto mb-10">
                             <div class="flex items-start space-x-4">
-                                <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 p-2">
-                                    <img src="../assets/images/logo-comfachoco-no-lema.svg" alt="ComfaChoco" class="w-full h-full object-contain">
+                                <div class="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                                    <span class="text-white text-3xl font-bold">
+                                        <?= htmlspecialchars($usuario['iniciales']) ?>
+                                    </span>
                                 </div>
                                 <div>
                                     <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
@@ -410,9 +421,13 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                             </div>
                                         </div>
                                         <div class="flex-shrink-0">
-                                            <img src="<?= htmlspecialchars($usuario['avatar']) ?>"
-                                                 alt="Usuario"
-                                                 class="w-11 h-11 rounded-xl object-cover shadow-md ring-2 ring-primary/20">
+                                            <div class="w-11 h-11 bg-primary rounded-xl flex items-center justify-center text-white shadow-md ring-2 ring-primary/20">
+                                                <?php if ($es_mujer): ?>
+                                                    <i class="fas fa-user-circle text-xl"></i>
+                                                <?php else: ?>
+                                                    <i class="fas fa-user text-xl"></i>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
                                     </div>
                                 </template>
@@ -1073,90 +1088,141 @@ $page_title = 'Asistente Virtual - ComfaChoco';
             filter: contrast(1.3);
         }
 
+        /* Alto Contraste + Modo Oscuro */
+        html.dark-mode body.high-contrast .text-gray-900 {
+            color: #ffffff !important;
+        }
+
+        html.dark-mode body.high-contrast .text-gray-800 {
+            color: #ffffff !important;
+        }
+
+        html.dark-mode body.high-contrast .text-gray-700 {
+            color: #f0f0f0 !important;
+        }
+
+        html.dark-mode body.high-contrast .text-gray-600 {
+            color: #e0e0e0 !important;
+        }
+
+        html.dark-mode body.high-contrast .text-gray-500 {
+            color: #d0d0d0 !important;
+        }
+
+        html.dark-mode body.high-contrast .text-gray-400 {
+            color: #c0c0c0 !important;
+        }
+
+        html.dark-mode body.high-contrast .bg-white {
+            background: #000000 !important;
+            border-color: #ffffff !important;
+            border-width: 2px !important;
+        }
+
         /* Modo Oscuro */
         html.dark-mode {
-            background: #1a1a1a;
+            background: #0a0a0a;
         }
 
         html.dark-mode body {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
         }
 
         html.dark-mode .bg-pattern {
-            background-color: #1a1a1a;
+            background-color: #0a0a0a;
             background-image:
-                radial-gradient(circle at 20% 50%, rgba(11, 138, 58, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(11, 138, 58, 0.08) 0%, transparent 50%);
+                radial-gradient(circle at 20% 50%, rgba(11, 138, 58, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(11, 138, 58, 0.12) 0%, transparent 50%);
         }
 
         /* Contenedor principal */
         html.dark-mode .glass-card {
-            background: rgba(30, 30, 30, 0.95) !important;
+            background: rgba(15, 15, 15, 0.95) !important;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
         }
 
         /* Header */
         html.dark-mode .bg-white {
-            background: #2d2d2d !important;
+            background: #0f0f0f !important;
             border-color: rgba(255, 255, 255, 0.1) !important;
         }
 
-        /* Textos */
+        /* Logo del asistente en modo oscuro */
+        html.dark-mode .dark-mode-logo {
+            background: #ffffff !important;
+            border-color: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        /* Logo del asistente en alto contraste */
+        body.high-contrast .dark-mode-logo {
+            background: #ffffff !important;
+            border-color: #000000 !important;
+            border-width: 2px !important;
+        }
+
+        /* Logo del asistente en modo oscuro + alto contraste */
+        html.dark-mode body.high-contrast .dark-mode-logo {
+            background: #ffffff !important;
+            border-color: #000000 !important;
+            border-width: 2px !important;
+        }
+
+        /* Textos - mantener visibles */
         html.dark-mode .text-gray-900 {
-            color: #f0f0f0 !important;
+            color: #ffffff !important;
         }
 
         html.dark-mode .text-gray-800 {
-            color: #e0e0e0 !important;
+            color: #f0f0f0 !important;
         }
 
         html.dark-mode .text-gray-700 {
-            color: #d0d0d0 !important;
+            color: #e0e0e0 !important;
         }
 
         html.dark-mode .text-gray-600 {
-            color: #b0b0b0 !important;
+            color: #c0c0c0 !important;
         }
 
         html.dark-mode .text-gray-500 {
-            color: #909090 !important;
+            color: #a0a0a0 !important;
         }
 
         html.dark-mode .text-gray-400 {
-            color: #707070 !important;
+            color: #808080 !important;
         }
 
         /* Fondos de mensajes */
         html.dark-mode .message-bot .bg-white {
-            background: #2d2d2d !important;
+            background: #1a1a1a !important;
             border-color: rgba(255, 255, 255, 0.1) !important;
         }
 
         /* Input */
         html.dark-mode input {
-            background: #2d2d2d !important;
-            color: #f0f0f0 !important;
+            background: #1a1a1a !important;
+            color: #ffffff !important;
             border-color: rgba(255, 255, 255, 0.2) !important;
         }
 
         html.dark-mode input:focus {
-            background: #363636 !important;
+            background: #242424 !important;
             border-color: #0B8A3A !important;
         }
 
         html.dark-mode input::placeholder {
-            color: #909090 !important;
+            color: #808080 !important;
         }
 
         /* Botones de opciones */
         html.dark-mode .permission-option {
-            background: #2d2d2d !important;
+            background: #0f0f0f !important;
             border-color: rgba(255, 255, 255, 0.1) !important;
         }
 
         html.dark-mode .permission-option:hover {
-            background: rgba(11, 138, 58, 0.1) !important;
+            background: rgba(11, 138, 58, 0.15) !important;
             border-color: #0B8A3A !important;
         }
 
@@ -1165,7 +1231,7 @@ $page_title = 'Asistente Virtual - ComfaChoco';
         html.dark-mode .bg-green-50,
         html.dark-mode .bg-purple-50,
         html.dark-mode .bg-orange-50 {
-            background: #2d2d2d !important;
+            background: #1a1a1a !important;
         }
 
         html.dark-mode .border-blue-200,
@@ -1177,13 +1243,31 @@ $page_title = 'Asistente Virtual - ComfaChoco';
 
         /* Gradientes suaves en modo oscuro */
         html.dark-mode .bg-gradient-to-br {
-            background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%) !important;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%) !important;
         }
 
         /* Panel de accesibilidad en modo oscuro */
         html.dark-mode .fixed .bg-white {
-            background: #2d2d2d !important;
+            background: #0f0f0f !important;
             border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        /* Panel de accesibilidad en modo oscuro + alto contraste */
+        html.dark-mode body.high-contrast .fixed .bg-white {
+            background: #000000 !important;
+            border-color: #ffffff !important;
+            border-width: 2px !important;
+        }
+
+        html.dark-mode body.high-contrast .fixed .bg-white * {
+            color: #ffffff !important;
+        }
+
+        html.dark-mode body.high-contrast .fixed .bg-white .text-gray-900,
+        html.dark-mode body.high-contrast .fixed .bg-white .text-gray-700,
+        html.dark-mode body.high-contrast .fixed .bg-white .text-gray-600,
+        html.dark-mode body.high-contrast .fixed .bg-white .text-gray-500 {
+            color: #ffffff !important;
         }
 
         html.dark-mode .border-gray-200 {
@@ -1191,12 +1275,12 @@ $page_title = 'Asistente Virtual - ComfaChoco';
         }
 
         html.dark-mode .bg-gray-50 {
-            background: #363636 !important;
+            background: #1a1a1a !important;
         }
 
         /* Scrollbar en modo oscuro */
         html.dark-mode .chat-scroll::-webkit-scrollbar-track {
-            background: #2d2d2d;
+            background: #0f0f0f;
         }
 
         html.dark-mode .chat-scroll::-webkit-scrollbar-thumb {
