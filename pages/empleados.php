@@ -92,7 +92,7 @@ include __DIR__ . '/../includes/header.php';
             <div class="px-6 py-5 border-b border-gray-100">
                 <div class="flex items-center justify-between">
                     <h3 class="text-xl font-semibold text-gray-900">Miembros del Equipo</h3>
-                    <button class="px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors">
+                    <button id="btn-agregar-miembro" type="button" class="px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors">
                         <i class="fas fa-user-plus mr-2"></i>
                         Agregar Miembro
                     </button>
@@ -117,7 +117,7 @@ include __DIR__ . '/../includes/header.php';
                                 <i class="fas fa-envelope mr-1"></i>
                                 Email
                             </a>
-                            <button class="text-gray-600 hover:text-gray-900">
+                            <button type="button" class="btn-opciones text-gray-600 hover:text-gray-900" data-email="<?= $miembro['email'] ?>" data-nombre="<?= $miembro['nombre'] ?>">
                                 <i class="fas fa-ellipsis-h"></i>
                             </button>
                         </div>
@@ -130,3 +130,116 @@ include __DIR__ . '/../includes/header.php';
 </main>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
+
+<script>
+// Handler para agregar miembro
+document.addEventListener('DOMContentLoaded', function() {
+    const btnAgregar = document.getElementById('btn-agregar-miembro');
+    if (btnAgregar) {
+        btnAgregar.addEventListener('click', async function() {
+            const nombre = prompt('Nombre completo:');
+            if (!nombre) return alert('Nombre requerido');
+            const puesto = prompt('Puesto:');
+            if (!puesto) return alert('Puesto requerido');
+            const departamento = prompt('Departamento:');
+            if (!departamento) return alert('Departamento requerido');
+            const email = prompt('Email:');
+            if (!email) return alert('Email requerido');
+            const avatar = prompt('URL de avatar (opcional):') || '';
+            const estado = prompt('Estado (activo/vacaciones):', 'activo');
+            if (!estado) return alert('Estado requerido');
+
+            const form = new FormData();
+            form.append('nombre', nombre);
+            form.append('puesto', puesto);
+            form.append('departamento', departamento);
+            form.append('email', email);
+            form.append('avatar', avatar);
+            form.append('estado', estado);
+
+            try {
+                const res = await fetch('api/equipo_create.php', { method: 'POST', body: form });
+                if (!res.ok) throw new Error('Error creando miembro');
+                const data = await res.json();
+                if (data && data.success) {
+                    alert('Miembro agregado');
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error al agregar miembro');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error de red al agregar miembro');
+            }
+        });
+    }
+
+    // Handler para menú de opciones
+    document.body.addEventListener('click', function(e) {
+        const btnOpciones = e.target.closest('.btn-opciones');
+        if (btnOpciones) {
+            const nombre = btnOpciones.getAttribute('data-nombre');
+            const email = btnOpciones.getAttribute('data-email');
+            const accion = prompt(`Acción para ${nombre} (${email}):\n1. Editar\n2. Eliminar\n3. Cambiar estado\nEscribe el número de la acción:`);
+            if (!accion) return;
+            if (accion === '1') {
+                // Editar
+                const nuevoPuesto = prompt('Nuevo puesto:');
+                if (!nuevoPuesto) return alert('Puesto requerido');
+                fetch('api/equipo_update.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, puesto: nuevoPuesto })
+                }).then(res => res.json()).then(data => {
+                    if (data && data.success) {
+                        alert('Puesto actualizado');
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Error al actualizar');
+                    }
+                }).catch(err => {
+                    console.error(err);
+                    alert('Error de red al actualizar');
+                });
+            } else if (accion === '2') {
+                // Eliminar
+                if (!confirm('¿Eliminar este miembro?')) return;
+                fetch('api/equipo_delete.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                }).then(res => res.json()).then(data => {
+                    if (data && data.success) {
+                        alert('Miembro eliminado');
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Error al eliminar');
+                    }
+                }).catch(err => {
+                    console.error(err);
+                    alert('Error de red al eliminar');
+                });
+            } else if (accion === '3') {
+                // Cambiar estado
+                const nuevoEstado = prompt('Nuevo estado (activo/vacaciones):', 'activo');
+                if (!nuevoEstado) return alert('Estado requerido');
+                fetch('api/equipo_update.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, estado: nuevoEstado })
+                }).then(res => res.json()).then(data => {
+                    if (data && data.success) {
+                        alert('Estado actualizado');
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Error al actualizar estado');
+                    }
+                }).catch(err => {
+                    console.error(err);
+                    alert('Error de red al actualizar estado');
+                });
+            }
+        }
+    });
+});
+</script>

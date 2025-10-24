@@ -17,11 +17,76 @@ if (empty($usuario['avatar'])) {
 $nombre_partes = explode(' ', $usuario['nombre']);
 $usuario['iniciales'] = substr($nombre_partes[0], 0, 1) . (isset($nombre_partes[1]) ? substr($nombre_partes[1], 0, 1) : '');
 
+// Políticas corporativas (texto formal para el panel derecho)
+// Políticas corporativas (texto formal para el panel derecho)
+$politicas = [
+    ['nombre' => 'Permiso de Vacaciones', 'categoria' => 'vacaciones', 'descripcion' => 'Permiso de vacaciones: 15 días hábiles por periodo de un año.'],
+    ['nombre' => 'Permiso de Maternidad/Paternidad', 'categoria' => 'permisos', 'descripcion' => 'Permiso maternidad o paternidad: mujeres 4 meses, hombres 15 días.'],
+    ['nombre' => 'Permisos Médicos', 'categoria' => 'permisos', 'descripcion' => 'Permisos médicos (deben estar acompañados de las órdenes médicas, todo anexo que tenga que ver con la enfermedad).'],
+    ['nombre' => 'Permiso por Servicio como Jurado', 'categoria' => 'permisos', 'descripcion' => 'Permiso por ser miembro o jurado.'],
+];
+
 $page_title = 'Executive Dashboard';
 
 include __DIR__ . '/../includes/head.php';
 include __DIR__ . '/../includes/sidebar.php';
 include __DIR__ . '/../includes/header.php';
+
+// Intentar cargar datos reales desde la base de datos (solicitudes recientes, eventos y actividad).
+try {
+    require_once __DIR__ . '/../config/database.php';
+    $conn = getConnection();
+
+    // Solicitudes recientes (mostrar 5)
+    $sql = "SELECT s.id, COALESCE(u.nombre, CONCAT('Usuario ', s.usuario_id)) AS empleado, s.tipo, s.fecha_inicio AS fecha, s.dias, s.estado, s.prioridad
+            FROM solicitudes s
+            LEFT JOIN usuarios u ON u.id = s.usuario_id
+            ORDER BY s.fecha_creacion DESC LIMIT 5";
+    $res = $conn->query($sql);
+    if ($res) {
+        $solicitudes_db = [];
+        while ($r = $res->fetch_assoc()) {
+            $solicitudes_db[] = [
+                'id' => (int)$r['id'],
+                'empleado' => $r['empleado'],
+                'avatar' => strtoupper(substr((string)$r['empleado'],0,2)),
+                'tipo' => $r['tipo'] ?? '',
+                'fecha' => $r['fecha'] ?? null,
+                'dias' => $r['dias'] ?? 1,
+                'estado' => $r['estado'] ?? 'pendiente',
+                'prioridad' => $r['prioridad'] ?? 'media'
+            ];
+        }
+        if (!empty($solicitudes_db)) $solicitudes = $solicitudes_db;
+    }
+
+    // Eventos calendario (últimos 20)
+    $sql = "SELECT titulo, fecha_inicio AS fecha, tipo FROM eventos ORDER BY fecha_creacion DESC LIMIT 20";
+    $res = $conn->query($sql);
+    if ($res) {
+        $eventos_db = [];
+        while ($r = $res->fetch_assoc()) {
+            $eventos_db[] = ['titulo' => $r['titulo'], 'fecha' => $r['fecha'], 'tipo' => $r['tipo']];
+        }
+        if (!empty($eventos_db)) $eventos_calendario = $eventos_db;
+    }
+
+    // Actividad reciente
+    $sql = "SELECT a.descripcion AS accion, COALESCE(u.nombre, 'Sistema') AS usuario, a.fecha_creacion AS tiempo, a.tipo FROM actividad a LEFT JOIN usuarios u ON u.id = a.usuario_id ORDER BY a.fecha_creacion DESC LIMIT 10";
+    $res = $conn->query($sql);
+    if ($res) {
+        $actividad_db = [];
+        while ($r = $res->fetch_assoc()) {
+            // Normalizar tipo para icon mapping
+            $actividad_db[] = ['usuario' => $r['usuario'], 'accion' => $r['accion'], 'tiempo' => $r['tiempo'], 'tipo' => $r['tipo'] ?? 'solicitud'];
+        }
+        if (!empty($actividad_db)) $actividad_reciente = $actividad_db;
+    }
+
+    $conn->close();
+} catch (Exception $e) {
+    // Mantener datos mock si falla la consulta
+}
 ?>
 
             <!-- Enhanced Page content -->
@@ -32,21 +97,34 @@ include __DIR__ . '/../includes/header.php';
                         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                             <div>
                                 <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
-                                    Bienvenido, <?= explode(' ', $usuario['nombre'])[0] ?> 👋
+                                    <?= htmlspecialchars($usuario['nombre']) ?>
                                 </h1>
                                 <p class="text-lg text-gray-600 max-w-2xl">
-                                    Aquí tienes un resumen completo de la actividad de tu equipo y métricas clave para hoy.
+                                    <span class="font-medium text-gray-800"><?= htmlspecialchars($usuario['rol'] ?: 'Colaborador') ?> &middot; <?= htmlspecialchars($usuario['empresa']) ?></span>
+                                    <?php if (!empty($usuario['email'])): ?>
+                                    <br>
+                                    <span class="text-sm text-gray-600">Correo: <?= htmlspecialchars($usuario['email']) ?></span>
+                                    <?php endif; ?>
                                 </p>
                             </div>
-                            <div class="mt-4 lg:mt-0 flex space-x-3">
-                                <button class="inline-flex items-center px-6 py-3 bg-primary text-white font-semibold rounded-2xl hover:bg-primary-dark transition-all duration-200 shadow-md hover:shadow-lg">
-                                    <i class="fas fa-plus mr-2"></i>
-                                    Nueva Solicitud
-                                </button>
-                                <button class="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-2xl hover:bg-gray-50 transition-all duration-200 shadow-sm">
-                                    <i class="fas fa-download mr-2"></i>
-                                    Exportar
-                                </button>
+                            <div class="mt-4 lg:mt-0 flex items-center space-x-4">
+                                <div class="flex items-center bg-white rounded-2xl px-4 py-2 shadow-sm border border-gray-100">
+                                    <img src="<?= htmlspecialchars($usuario['avatar']) ?>" alt="Avatar" class="w-10 h-10 rounded-md object-cover mr-3">
+                                    <div class="text-left">
+                                        <div class="text-sm font-semibold text-gray-900"><?= htmlspecialchars($usuario['nombre']) ?></div>
+                                        <div class="text-xs text-gray-500"><?= htmlspecialchars($usuario['rol'] ?: 'Colaborador') ?></div>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-3">
+                                    <button id="btn-new-solicitud" class="inline-flex items-center px-6 py-3 bg-primary text-white font-semibold rounded-2xl hover:bg-primary-dark transition-all duration-200 shadow-md hover:shadow-lg">
+                                        <i class="fas fa-plus mr-2"></i>
+                                        Nueva Solicitud
+                                    </button>
+                                    <button id="btn-dashboard-export" class="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-2xl hover:bg-gray-50 transition-all duration-200 shadow-sm">
+                                        <i class="fas fa-download mr-2"></i>
+                                        Exportar
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="mt-6 bg-gradient-to-r from-primary to-primary-dark rounded-2xl p-8 text-white shadow-elegant">
@@ -117,6 +195,66 @@ include __DIR__ . '/../includes/header.php';
                     <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
                         <!-- Main content - Enhanced Table -->
                         <div class="xl:col-span-2 space-y-8">
+                            <!-- Políticas y Tipos de Permisos -->
+                            <div class="grid grid-cols-1 gap-6 mb-8">
+                                <!-- Tipos de Permisos -->
+                                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                                    <div class="px-6 py-5 border-b border-gray-100">
+                                        <div class="flex items-center justify-between">
+                                            <h3 class="text-xl font-semibold text-gray-900">
+                                                Tipos de Permisos
+                                            </h3>
+                                            <button class="px-4 py-2 text-sm bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors">
+                                                <i class="fas fa-plus mr-2"></i>
+                                                Nuevo Tipo
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="divide-y divide-gray-100 max-h-96 overflow-y-auto scrollbar-thin">
+                                        <?php
+                                        // Tipos de permiso actualizados según políticas corporativas
+                                        $tipos_permisos = [
+                                            ['nombre' => 'Permiso de Vacaciones', 'dias' => 15, 'requiere_doc' => false],
+                                            ['nombre' => 'Permiso de Maternidad/Paternidad', 'dias' => null, 'requiere_doc' => true],
+                                            ['nombre' => 'Permiso Médico', 'dias' => null, 'requiere_doc' => true],
+                                            ['nombre' => 'Permiso por Servicio como Jurado', 'dias' => null, 'requiere_doc' => true],
+                                            ['nombre' => 'Teletrabajo', 'dias' => null, 'requiere_doc' => false],
+                                        ];
+                                        foreach ($tipos_permisos as $tipo):
+                                        ?>
+                                        <div class="p-4 hover:bg-gray-50/50 transition-colors duration-150">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <h4 class="text-sm font-semibold text-gray-900"><?= $tipo['nombre'] ?></h4>
+                                                    <div class="flex items-center mt-1 space-x-2">
+                                                        <?php if ($tipo['dias']): ?>
+                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                            <?= $tipo['dias'] ?> días máx.
+                                                        </span>
+                                                        <?php endif; ?>
+                                                        <?php if ($tipo['requiere_doc']): ?>
+                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                                            <i class="fas fa-file-medical mr-1"></i>
+                                                            Requiere documentación
+                                                        </span>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="flex items-center space-x-2">
+                                                    <button class="w-8 h-8 bg-gray-100 text-gray-600 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors">
+                                                        <i class="fas fa-edit text-xs"></i>
+                                                    </button>
+                                                    <button class="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center hover:bg-red-200 transition-colors">
+                                                        <i class="fas fa-trash text-xs"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Enhanced Requests Table -->
                             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                                 <div class="px-6 py-5 border-b border-gray-100">
@@ -183,10 +321,10 @@ include __DIR__ . '/../includes/header.php';
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                     <div class="flex items-center space-x-2">
                                                         <?php if ($solicitud['estado'] == 'pendiente'): ?>
-                                                        <button class="w-8 h-8 bg-green-100 text-green-600 rounded-lg flex items-center justify-center hover:bg-green-200 transition-colors">
+                                                        <button data-id="<?= $solicitud['id'] ?>" class="btn-approve w-8 h-8 bg-green-100 text-green-600 rounded-lg flex items-center justify-center hover:bg-green-200 transition-colors">
                                                             <i class="fas fa-check text-xs"></i>
                                                         </button>
-                                                        <button class="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center hover:bg-red-200 transition-colors">
+                                                        <button data-id="<?= $solicitud['id'] ?>" class="btn-reject w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center hover:bg-red-200 transition-colors">
                                                             <i class="fas fa-times text-xs"></i>
                                                         </button>
                                                         <?php else: ?>
@@ -226,7 +364,7 @@ include __DIR__ . '/../includes/header.php';
                                         <h3 class="text-xl font-semibold text-gray-900">
                                             Calendario de Ausencias
                                         </h3>
-                                        <button class="px-4 py-2 text-sm bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors">
+                                        <button id="btn-new-event" class="px-4 py-2 text-sm bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors">
                                             <i class="fas fa-plus mr-2"></i>
                                             Nuevo Evento
                                         </button>
@@ -240,6 +378,7 @@ include __DIR__ . '/../includes/header.php';
 
                         <!-- Enhanced Sidebar content -->
                         <div class="space-y-8">
+                            <!-- (Panel de políticas eliminado; ahora está disponible en la pestaña Políticas) -->
                             <!-- Enhanced Activity Feed -->
                             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                                 <div class="px-6 py-5 border-b border-gray-100">
@@ -310,7 +449,7 @@ include __DIR__ . '/../includes/header.php';
                                     </h3>
                                 </div>
                                 <div class="p-6 space-y-4">
-                                    <button class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all duration-200 group">
+                                    <button id="btn-dashboard-export-csv" class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all duration-200 group">
                                         <div class="flex items-center">
                                             <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-4 group-hover:bg-green-200 transition-colors">
                                                 <i class="fas fa-file-csv text-green-600"></i>
@@ -323,7 +462,7 @@ include __DIR__ . '/../includes/header.php';
                                         <i class="fas fa-download text-gray-400 group-hover:text-primary transition-colors"></i>
                                     </button>
 
-                                    <button class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all duration-200 group">
+                                    <button id="btn-dashboard-export-pdf" class="w-full flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all duration-200 group">
                                         <div class="flex items-center">
                                             <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4 group-hover:bg-blue-200 transition-colors">
                                                 <i class="fas fa-file-pdf text-blue-600"></i>
@@ -354,6 +493,128 @@ window.calendarEvents = [
     },
     <?php endforeach; ?>
 ];
+</script>
+
+<script>
+// Wire up dashboard export buttons to download CSV reports
+const exportEndpoint = 'api/export_report.php';
+
+function downloadReport(report, format = 'csv') {
+    const url = `${exportEndpoint}?report=${encodeURIComponent(report)}&format=${encodeURIComponent(format)}`;
+    // Open in new tab to trigger download without navigating away
+    window.open(url, '_blank');
+}
+
+document.getElementById('btn-dashboard-export')?.addEventListener('click', function() {
+    // Default: download monthly CSV
+    downloadReport('monthly', 'csv');
+});
+
+document.getElementById('btn-dashboard-export-csv')?.addEventListener('click', function() {
+    downloadReport('monthly', 'csv');
+});
+
+document.getElementById('btn-dashboard-export-pdf')?.addEventListener('click', function() {
+    // Generate PDF report (monthly)
+    downloadReport('monthly', 'pdf');
+});
+
+// Approve / Reject handlers for solicitudes
+document.querySelectorAll('.btn-approve').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const id = this.dataset.id;
+        if (!confirm('¿Aprobar solicitud #' + id + '?')) return;
+        try {
+            const res = await fetch('api/solicitud_action.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({id: id, action: 'approve'})
+            });
+            const data = await res.json();
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.error || 'Error');
+            }
+        } catch (err) { console.error(err); alert('Error de red'); }
+    });
+});
+
+document.querySelectorAll('.btn-reject').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const id = this.dataset.id;
+        if (!confirm('¿Rechazar solicitud #' + id + '?')) return;
+        try {
+            const res = await fetch('api/solicitud_action.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({id: id, action: 'reject'})
+            });
+            const data = await res.json();
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.error || 'Error');
+            }
+        } catch (err) { console.error(err); alert('Error de red'); }
+    });
+});
+
+// New solicitud (simple prompts)
+document.getElementById('btn-new-solicitud')?.addEventListener('click', async function() {
+    const tipo = prompt('Tipo de permiso (ej. Vacaciones)');
+    if (!tipo) return;
+    const fecha_inicio = prompt('Fecha inicio (YYYY-MM-DD)');
+    if (!fecha_inicio) return;
+    const fecha_fin = prompt('Fecha fin (YYYY-MM-DD)', fecha_inicio);
+    const dias = prompt('Días', '1');
+    const motivo = prompt('Motivo');
+
+    const form = new FormData();
+    form.append('tipo', tipo);
+    form.append('fecha_inicio', fecha_inicio);
+    form.append('fecha_fin', fecha_fin);
+    form.append('dias', dias);
+    form.append('motivo', motivo);
+
+    try {
+        const res = await fetch('api/solicitud_create.php', { method: 'POST', body: form });
+        const data = await res.json();
+        if (data.success) {
+            alert('Solicitud creada (ID ' + data.id + ')');
+            location.reload();
+        } else {
+            alert(data.error || 'Error al crear solicitud');
+        }
+    } catch (err) { console.error(err); alert('Error de red'); }
+});
+
+// New event
+document.getElementById('btn-new-event')?.addEventListener('click', async function() {
+    const title = prompt('Título del evento');
+    if (!title) return;
+    const fecha_inicio = prompt('Fecha inicio (YYYY-MM-DD)');
+    if (!fecha_inicio) return;
+    const fecha_fin = prompt('Fecha fin (YYYY-MM-DD)', fecha_inicio);
+    const tipo = prompt('Tipo (vacaciones, permiso, reunion, teletrabajo, otro)', 'otro');
+
+    const form = new FormData();
+    form.append('title', title);
+    form.append('fecha_inicio', fecha_inicio);
+    form.append('fecha_fin', fecha_fin);
+    form.append('tipo', tipo);
+
+    try {
+        const res = await fetch('api/event_create.php', { method: 'POST', body: form });
+        const data = await res.json();
+        if (data.success) {
+            alert('Evento creado (ID ' + data.id + ')');
+            location.reload();
+        } else {
+            alert(data.error || 'Error al crear evento');
+        }
+    } catch (err) { console.error(err); alert('Error de red'); }
+});
 </script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

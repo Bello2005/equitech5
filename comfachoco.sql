@@ -2,6 +2,33 @@
 CREATE DATABASE IF NOT EXISTS comfachoco CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE comfachoco;
 
+-- Tabla de tipos de permisos
+CREATE TABLE IF NOT EXISTS tipos_permisos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    dias_maximos INT DEFAULT NULL,
+    requiere_documentacion BOOLEAN DEFAULT FALSE,
+    activo TINYINT(1) DEFAULT 1,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_activo (activo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabla de políticas
+CREATE TABLE IF NOT EXISTS politicas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT NOT NULL,
+    categoria ENUM('vacaciones', 'permisos', 'teletrabajo', 'general') NOT NULL,
+    aplicable_a ENUM('todos', 'gerentes', 'empleados') DEFAULT 'todos',
+    activo TINYINT(1) DEFAULT 1,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_categoria (categoria),
+    INDEX idx_activo (activo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Tabla de usuarios
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -21,11 +48,12 @@ CREATE TABLE IF NOT EXISTS usuarios (
 CREATE TABLE IF NOT EXISTS solicitudes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
-    tipo ENUM('vacaciones', 'permiso_medico', 'teletrabajo', 'capacitacion', 'otro') NOT NULL,
+    tipo_permiso_id INT NOT NULL,
     fecha_inicio DATE NOT NULL,
     fecha_fin DATE NOT NULL,
     dias INT NOT NULL,
     motivo TEXT,
+    documentacion_url VARCHAR(255) DEFAULT NULL,
     estado ENUM('pendiente', 'aprobado', 'rechazado') DEFAULT 'pendiente',
     prioridad ENUM('alta', 'media', 'baja') DEFAULT 'media',
     aprobador_id INT DEFAULT NULL,
@@ -35,6 +63,7 @@ CREATE TABLE IF NOT EXISTS solicitudes (
     fecha_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (aprobador_id) REFERENCES usuarios(id) ON DELETE SET NULL,
+    FOREIGN KEY (tipo_permiso_id) REFERENCES tipos_permisos(id) ON DELETE RESTRICT,
     INDEX idx_usuario (usuario_id),
     INDEX idx_estado (estado),
     INDEX idx_fecha_inicio (fecha_inicio)
@@ -67,6 +96,26 @@ CREATE TABLE IF NOT EXISTS eventos (
     INDEX idx_fecha_inicio (fecha_inicio),
     INDEX idx_tipo (tipo)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insertar tipos de permisos predefinidos
+INSERT INTO tipos_permisos (nombre, descripcion, dias_maximos, requiere_documentacion) VALUES
+('Vacaciones anuales', 'Periodo de descanso remunerado anual', 15, FALSE),
+('Permiso médico', 'Ausencia por razones de salud', NULL, TRUE),
+('Licencia por maternidad', 'Permiso por nacimiento o adopción', 84, TRUE),
+('Licencia por paternidad', 'Permiso por nacimiento o adopción', 10, TRUE),
+('Teletrabajo', 'Trabajo remoto desde casa', NULL, FALSE),
+('Capacitación', 'Ausencia por formación profesional', 5, TRUE),
+('Duelo', 'Permiso por fallecimiento de familiar', 5, TRUE),
+('Permiso personal', 'Ausencia por asuntos personales', 3, FALSE);
+
+-- Insertar políticas predefinidas
+INSERT INTO politicas (nombre, descripcion, categoria, aplicable_a) VALUES
+('Política de vacaciones', 'Las vacaciones deben solicitarse con al menos 2 semanas de anticipación. Se debe mantener un mínimo de personal activo del 70% en cada departamento.', 'vacaciones', 'todos'),
+('Política de teletrabajo', 'El teletrabajo debe ser aprobado por el supervisor directo. Se requiere conectividad y disponibilidad durante el horario laboral.', 'teletrabajo', 'todos'),
+('Documentación médica', 'Los permisos médicos de más de 2 días requieren certificado médico oficial.', 'permisos', 'todos'),
+('Límite de permisos personales', 'Máximo 3 días de permisos personales por trimestre.', 'permisos', 'empleados'),
+('Aprobación de vacaciones', 'Los gerentes tienen prioridad en la selección de fechas de vacaciones.', 'vacaciones', 'gerentes'),
+('Política de turnos', 'Debe mantenerse una cobertura mínima del 50% en cada área durante períodos vacacionales.', 'general', 'todos');
 
 -- Insertar usuario administrador por defecto
 -- Contraseña: admin123

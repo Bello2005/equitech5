@@ -5,3 +5,85 @@
     font-weight: 500;
     padding: 2px 4px;
 }
+
+/* Estilos para la barra de herramientas del calendario: botones verdes */
+.fc .fc-toolbar {
+    padding: 0.25rem 0.5rem;
+}
+.fc .fc-toolbar .fc-button {
+    background-color: #0B8A3A; /* verde ComfaChoco */
+    color: #ffffff;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.45rem 0.7rem;
+    box-shadow: none;
+    font-weight: 600;
+}
+.fc .fc-toolbar .fc-button:hover {
+    background-color: #0a7532;
+}
+.fc .fc-toolbar .fc-button:focus {
+    outline: 2px solid rgba(11,138,58,0.18);
+}
+.fc .fc-toolbar .fc-button.fc-button-active {
+    background-color: #075725;
+}
+
+/* Ajustes para los botones de vista (month/week/day) a la derecha */
+.fc .fc-toolbar-chunk:last-child .fc-button {
+    background-color: #0B8A3A;
+    color: #fff;
+}
+
+/* Título centrado con mayúscula inicial y color de texto oscuro */
+.fc .fc-toolbar-title {
+    text-transform: lowercase;
+    font-size: 1.25rem;
+    color: #0f172a; /* gray-900 */
+}
+
+/* Eventos siguen respetando su color (color y textColor) */
+.fc-event {
+    color: inherit; /* permitir que textColor de FullCalendar se aplique */
+}
+
+/* Forzar botones de la toolbar a verde (más específica y con !important para evitar sobrescrituras) */
+.fc .fc-toolbar .fc-button,
+.fc .fc-toolbar button.fc-button,
+.fc .fc-toolbar .fc-button.fc-button-primary,
+.fc .fc-toolbar .fc-button-primary {
+    background-color: #0B8A3A !important; /* verde ComfaChoco */
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 0.5rem !important;
+    padding: 0.45rem 0.7rem !important;
+    box-shadow: none !important;
+    font-weight: 600 !important;
+}
+
+.fc .fc-toolbar .fc-button:hover,
+.fc .fc-toolbar .fc-button:not(.fc-button-disabled):hover {
+    background-color: #0a7532 !important;
+}
+
+.fc .fc-toolbar .fc-button:focus {
+    outline: 2px solid rgba(11,138,58,0.18) !important;
+}
+
+.fc .fc-toolbar .fc-button.fc-button-active,
+.fc .fc-toolbar .fc-button:active {
+    background-color: #075725 !important;
+}
+
+/* Asegurar que los íconos dentro de los botones también sean blancos */
+.fc .fc-toolbar .fc-button .fc-icon,
+.fc .fc-toolbar .fc-button i {
+    color: #ffffff !important;
+}
+
+/* Ajuste final al título para mantener apariencia */
+.fc .fc-toolbar-title {
+    text-transform: lowercase;
+    font-size: 1.25rem;
+    color: #0f172a; /* gray-900 */
+}

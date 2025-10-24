@@ -32,7 +32,7 @@ function isLoggedIn() {
 // Función para requerir autenticación
 function requireLogin() {
     if (!isLoggedIn()) {
-        $app_url = env('APP_URL', '/Comfachoco');
+        $app_url = env('APP_URL', '/comfachoco');
         header("Location: {$app_url}/index.php");
         exit();
     }

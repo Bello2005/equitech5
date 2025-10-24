@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
 
     if (authenticate($email, $password)) {
-        header('Location: /Comfachoco/pages/dashboard.php');
+        header('Location: /comfachoco/pages/dashboard.php');
         exit();
     } else {
         $error = 'Credenciales incorrectas. Por favor intenta de nuevo.';
@@ -36,12 +36,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="max-w-md w-full space-y-8 relative z-10">
             <!-- Logo y título -->
             <div class="text-center">
-                <div class="flex justify-center">
-                    <div class="w-20 h-20 bg-gradient-to-br from-primary to-primary-dark rounded-2xl flex items-center justify-center shadow-elegant">
-                        <span class="text-white font-bold text-3xl">C</span>
-                    </div>
+                <div class="flex justify-center mb-6">
+                    <img src="../assets/images/logo-comfachoco-no-lema.svg"
+                         alt="ComfaChoco Logo"
+                         class="h-24 w-auto">
                 </div>
-                <h2 class="mt-6 text-3xl font-bold text-gray-900">
+                <h2 class="text-3xl font-bold text-gray-900">
                     ComfaChoco International
                 </h2>
                 <p class="mt-2 text-sm text-gray-600">

@@ -20,9 +20,11 @@ function getConnection() {
 
         $conn->set_charset("utf8mb4");
 
-        // Configurar zona horaria si está definida
-        $timezone = env('TIMEZONE', 'America/Bogota');
-        $conn->query("SET time_zone = '{$timezone}'");
+        // Configurar zona horaria si está definida (formato offset: -05:00 para Colombia)
+        $timezone = env('TIMEZONE', '-05:00');
+        if (!empty($timezone)) {
+            $conn->query("SET time_zone = '{$timezone}'");
+        }
 
         return $conn;
     } catch (Exception $e) {
