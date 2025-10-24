@@ -1,0 +1,64 @@
+# Variables de entorno
+.env
+.env.local
+.env.*.local
+
+# Archivos de backup
+*.backup
+*.bak
+*.old
+*.orig
+
+# Logs
+logs/
+*.log
+error_log
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Dependencias (si usas Composer en el futuro)
+/vendor/
+composer.lock
+
+# Archivos temporales
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Uploads (si tienes carpeta de uploads)
+uploads/*
+!uploads/.gitkeep
+
+# Cache
+cache/
+*.cache
+
+# Archivos de sesión
+sessions/
+tmp/
+
+# Archivos sensibles
+config/database.local.php
+config/secrets.php
+*.pem
+*.key
+*.crt
+
+# Node modules (si usas npm en el futuro)
+node_modules/
+package-lock.json
+
+# Build files
+dist/
+build/
