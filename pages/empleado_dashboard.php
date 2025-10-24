@@ -301,48 +301,22 @@ $page_title = 'Asistente Virtual - ComfaChoco';
 
                     <!-- Welcome Screen -->
                     <div x-show="messages.length === 0" x-cloak class="slide-up">
-                        <!-- Fila Superior: Saludo (izquierda) + Días Disponibles (derecha) -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-                            <!-- Columna Izquierda: Saludo -->
-                            <div class="flex flex-col justify-center">
-                                <div class="flex items-start space-x-4">
-                                    <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 p-2">
-                                        <img src="../assets/images/logo-comfachoco-no-lema.svg" alt="ComfaChoco" class="w-full h-full object-contain">
-                                    </div>
-                                    <div>
-                                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-                                            ¡Hola <?= htmlspecialchars($primer_nombre) ?>! 👋
-                                        </h2>
-                                        <p class="text-lg md:text-xl text-gray-600">
-                                            Soy el asistente de ComfaChoco. Estoy aquí para ayudarte con tus permisos y vacaciones de forma sencilla.
-                                        </p>
-                                    </div>
+                        <!-- Saludo -->
+                        <div class="max-w-4xl mx-auto mb-10">
+                            <div class="flex items-start space-x-4">
+                                <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 p-2">
+                                    <img src="../assets/images/logo-comfachoco-no-lema.svg" alt="ComfaChoco" class="w-full h-full object-contain">
                                 </div>
-                            </div>
-
-                            <!-- Columna Derecha: Días de Vacaciones (Clickeable) -->
-                            <div class="flex items-center justify-center">
-                                <div class="w-full max-w-md">
-                                    <button @click="quickMessage('Tengo 15 días de vacaciones disponibles, quiero solicitar algunos')"
-                                            class="w-full bg-gradient-to-br from-blue-50 to-green-50 rounded-2xl p-8 shadow-xl border-2 border-primary/30 hover:border-primary hover:shadow-2xl transition-all duration-300 group cursor-pointer">
-                                        <div class="text-center">
-                                            <div class="w-16 h-16 bg-primary rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                                <i class="fas fa-umbrella-beach text-white text-3xl"></i>
-                                            </div>
-                                            <p class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">Días Disponibles</p>
-                                            <p class="text-6xl font-bold text-primary mb-3 group-hover:scale-105 transition-transform duration-300">15</p>
-                                            <p class="text-sm text-gray-600 mb-2">
-                                                <i class="fas fa-calendar-check text-primary mr-1"></i>
-                                                Vacaciones disponibles este año
-                                            </p>
-                                            <div class="mt-4 pt-4 border-t border-primary/20">
-                                                <p class="text-xs text-primary font-semibold flex items-center justify-center">
-                                                    <i class="fas fa-hand-pointer mr-2"></i>
-                                                    Haz clic para solicitar vacaciones
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </button>
+                                <div>
+                                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+                                        ¡Hola <?= htmlspecialchars($primer_nombre) ?>! 👋
+                                    </h2>
+                                    <p class="text-lg md:text-xl text-gray-600 mb-2">
+                                        Soy el asistente de ComfaChoco. Estoy aquí para ayudarte con tus permisos y vacaciones de forma sencilla.
+                                    </p>
+                                    <p class="text-lg text-gray-700">
+                                        Tienes <span class="text-primary font-semibold text-2xl">15 días</span> de vacaciones disponibles.
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -637,6 +611,7 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                 <i class="fas fa-info-circle text-primary mr-2"></i>
                                 Estos días están disponibles para usar durante el año 2024.
                             </p>
+                            ${this.getActionButtons()}
                         `;
                     }
 
