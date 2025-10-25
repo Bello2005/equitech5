@@ -253,26 +253,27 @@ $page_title = 'Asistente Virtual - ComfaChoco';
     </script>
 </head>
 <body class="bg-pattern min-h-screen">
-    <div class="min-h-screen flex items-center justify-center p-4 md:p-8" x-data="premiumChat()" x-init="window.premiumChatInstance = $data">
+    <div class="min-h-screen flex items-center justify-center p-1 sm:p-2 md:p-3 lg:p-4" x-data="premiumChat()" x-init="window.premiumChatInstance = $data">
         <!-- Main Container -->
-        <div class="w-full max-w-5xl h-[85vh] md:h-[90vh] glass-card rounded-3xl shadow-2xl overflow-hidden flex flex-col fade-scale">
+        <div class="w-full max-w-xs sm:max-w-md md:max-w-xl lg:max-w-2xl xl:max-w-3xl h-[90vh] sm:h-[92vh] md:h-[93vh] glass-card rounded-lg sm:rounded-xl md:rounded-2xl shadow-2xl overflow-hidden flex flex-col fade-scale">
 
             <!-- Header Premium -->
-            <div class="relative bg-white border-b border-gray-100 px-6 md:px-8 py-5">
+            <div class="relative bg-white border-b border-gray-100 px-2 sm:px-3 md:px-4 py-2 sm:py-3">
                 <div class="flex items-center justify-between">
                     <!-- Logo y título -->
-                    <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
                         <div class="relative">
-                            <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-lg border-2 border-gray-100 dark-mode-logo">
-                                <img src="../assets/images/logo-comfachoco-no-lema.svg" alt="ComfaChocó Logo" class="w-10 h-10 object-contain">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg border-2 border-gray-100 dark-mode-logo">
+                                <img src="../assets/images/logo-comfachoco-no-lema.svg" alt="ComfaChocó Logo" class="w-6 h-6 sm:w-8 sm:h-8 object-contain">
                             </div>
-                            <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-3 border-white status-badge"></div>
+                            <div class="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-400 rounded-full border-2 border-white status-badge"></div>
                         </div>
                         <div>
-                            <h1 class="text-xl md:text-2xl font-bold text-gray-900">Asistente Permisos ComfaChocó</h1>
-                            <p class="text-sm text-gray-500 mt-0.5 flex items-center">
+                            <h1 class="text-sm sm:text-base md:text-lg font-bold text-gray-900">Asistente Permisos ComfaChocó</h1>
+                            <p class="text-xs sm:text-sm text-gray-500 mt-0.5 flex items-center">
                                 <span class="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-                                Siempre disponible para ayudarte.
+                                <span class="hidden sm:inline">Disponible</span>
+                                <span class="sm:hidden">✓</span>
                             </p>
                         </div>
                     </div>
@@ -306,78 +307,78 @@ $page_title = 'Asistente Virtual - ComfaChoco';
 
             <!-- Chat Area -->
             <div class="flex-1 overflow-y-auto chat-scroll bg-transparent" x-ref="chatContainer">
-                <div class="max-w-7xl mx-auto px-4 md:px-8 py-6">
+                <div class="max-w-7xl mx-auto px-2 sm:px-3 md:px-4 py-2 sm:py-3 md:py-4">
 
                     <!-- Welcome Screen -->
                     <div class="slide-up">
                         <!-- Saludo -->
-                        <div class="max-w-4xl mx-auto mb-10">
-                            <div class="flex items-start space-x-4">
-                                <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 p-2">
-                                    <img src="../assets/images/logo-comfachoco-no-lema.svg" alt="ComfaChoco" class="w-full h-full object-contain">
-                                </div>
-                                <div>
-                                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-                                        ¡Hola <?= htmlspecialchars($primer_nombre) ?>! 👋
-                                        <span class="text-primary font-semibold text-2xl">Tienes 15 días de vacaciones disponibles.</span>
-                                    </h2>
-                                    <p class="text-lg md:text-xl text-gray-600 mb-2">
-                                        Soy el asistente de ComfaChoco. Estoy aquí para ayudarte con tus permisos y vacaciones de forma sencilla.
-                                    </p>
+                        <div class="max-w-4xl mx-auto mb-4 sm:mb-6 md:mb-8">
+                            <div class="flex items-start space-x-2 sm:space-x-3 md:space-x-4">
+                                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 p-2">
+                                        <img src="../assets/images/logo-comfachoco-no-lema.svg" alt="ComfaChoco" class="w-full h-full object-contain">
+                                    </div>
+                                    <div>
+                                    <h2 class="text-sm sm:text-base md:text-lg font-bold text-gray-900 mb-1">
+                                            ¡Hola <?= htmlspecialchars($primer_nombre) ?>! 👋
+                                        <span class="text-primary font-semibold text-xs sm:text-sm block sm:inline sm:ml-2">Tienes 15 días disponibles.</span>
+                                        </h2>
+                                    <p class="text-xs sm:text-sm text-gray-600 mb-2">
+                                            Soy el asistente de ComfaChoco. Estoy aquí para ayudarte con tus permisos y vacaciones de forma sencilla.
+                                        </p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Botones de Acción -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 max-w-3xl mx-auto">
                             <button @click="quickMessage('Quiero solicitar permisos')"
-                                    class="card-hover bg-white border-2 border-primary/20 rounded-xl p-5 text-left shadow-lg hover:border-primary">
-                                <div class="flex items-center space-x-4">
-                                    <div class="w-14 h-14 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
-                                        <i class="fas fa-clipboard-list text-white text-xl"></i>
+                                    class="card-hover bg-white border-2 border-primary/20 rounded-lg p-2 sm:p-3 text-left shadow-lg hover:border-primary">
+                                <div class="flex items-center space-x-2 sm:space-x-3">
+                                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0 shadow-md">
+                                        <i class="fas fa-clipboard-list text-white text-sm sm:text-base"></i>
                                     </div>
                                     <div class="flex-1">
-                                        <h3 class="font-bold text-gray-900 text-base mb-1">Solicitar Permisos</h3>
-                                        <p class="text-gray-600 text-sm">Gestiona tus permisos y vacaciones</p>
+                                        <h3 class="font-bold text-gray-900 text-xs sm:text-sm mb-0.5">Solicitar Permisos</h3>
+                                        <p class="text-gray-600 text-xs">Gestiona tus permisos y vacaciones</p>
                                     </div>
                                 </div>
                             </button>
 
                             <button @click="quickMessage('¿Cuántos días de permiso tengo disponibles?')"
-                                    class="card-hover bg-white border-2 border-primary/20 rounded-xl p-5 text-left shadow-lg hover:border-primary">
-                                <div class="flex items-center space-x-4">
-                                    <div class="w-14 h-14 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
-                                        <i class="fas fa-calendar-check text-white text-xl"></i>
+                                    class="card-hover bg-white border-2 border-primary/20 rounded-lg p-2 sm:p-3 text-left shadow-lg hover:border-primary">
+                                <div class="flex items-center space-x-2 sm:space-x-3">
+                                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-green-500 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+                                        <i class="fas fa-calendar-check text-white text-lg sm:text-xl"></i>
                                     </div>
                                     <div class="flex-1">
-                                        <h3 class="font-bold text-gray-900 text-base mb-1">Ver Mis Días Disponibles</h3>
-                                        <p class="text-gray-600 text-sm">Consulta tu saldo completo</p>
+                                        <h3 class="font-bold text-gray-900 text-xs sm:text-sm mb-0.5">Ver Mis Días Disponibles</h3>
+                                        <p class="text-gray-600 text-xs sm:text-sm">Consulta tu saldo completo</p>
                                     </div>
                                 </div>
                             </button>
 
                             <button @click="quickMessage('Estado de mis solicitudes')"
-                                    class="card-hover bg-white border-2 border-primary/20 rounded-xl p-5 text-left shadow-lg hover:border-primary">
-                                <div class="flex items-center space-x-4">
-                                    <div class="w-14 h-14 bg-orange-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
-                                        <i class="fas fa-list-check text-white text-xl"></i>
+                                    class="card-hover bg-white border-2 border-primary/20 rounded-lg p-2 sm:p-3 text-left shadow-lg hover:border-primary">
+                                <div class="flex items-center space-x-2 sm:space-x-3">
+                                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-orange-500 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+                                        <i class="fas fa-list-check text-white text-lg sm:text-xl"></i>
                                     </div>
                                     <div class="flex-1">
-                                        <h3 class="font-bold text-gray-900 text-base mb-1">Revisar Mis Solicitudes</h3>
-                                        <p class="text-gray-600 text-sm">Estado de tus permisos</p>
+                                        <h3 class="font-bold text-gray-900 text-xs sm:text-sm mb-0.5">Revisar Mis Solicitudes</h3>
+                                        <p class="text-gray-600 text-xs sm:text-sm">Estado de tus permisos</p>
                                     </div>
                                 </div>
                             </button>
 
                             <button @click="quickMessage('Quiero conocer las políticas de permisos')"
-                                    class="card-hover bg-white border-2 border-primary/20 rounded-xl p-5 text-left shadow-lg hover:border-primary">
-                                <div class="flex items-center space-x-4">
-                                    <div class="w-14 h-14 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
-                                        <i class="fas fa-book text-white text-xl"></i>
+                                    class="card-hover bg-white border-2 border-primary/20 rounded-lg p-2 sm:p-3 text-left shadow-lg hover:border-primary">
+                                <div class="flex items-center space-x-2 sm:space-x-3">
+                                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-purple-500 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+                                        <i class="fas fa-book text-white text-lg sm:text-xl"></i>
                                     </div>
                                     <div class="flex-1">
-                                        <h3 class="font-bold text-gray-900 text-base mb-1">Políticas y Reglas</h3>
-                                        <p class="text-gray-600 text-sm">Normas sobre vacaciones</p>
+                                        <h3 class="font-bold text-gray-900 text-xs sm:text-sm mb-0.5">Políticas y Reglas</h3>
+                                        <p class="text-gray-600 text-xs sm:text-sm">Normas sobre vacaciones</p>
                                     </div>
                                 </div>
                             </button>
@@ -397,8 +398,8 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                             </div>
                                         </div>
                                         <div class="flex-1">
-                                            <div class="bg-white rounded-2xl rounded-tl-md px-6 py-4 shadow-md border border-gray-100">
-                                                <div class="text-gray-800 text-base text-readable leading-relaxed" x-html="message.text"></div>
+                                            <div class="bg-white rounded-2xl rounded-tl-md px-3 sm:px-4 py-2 sm:py-3 shadow-md border border-gray-100">
+                                                <div class="text-gray-800 text-xs sm:text-sm text-readable leading-relaxed" x-html="message.text"></div>
                                             </div>
                                             <p class="text-xs text-gray-400 mt-2 ml-4" x-text="message.time"></p>
                                         </div>
@@ -410,8 +411,8 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                     <div class="flex items-start justify-end space-x-4 message-user">
                                         <div class="flex-1 flex justify-end">
                                             <div class="max-w-xl">
-                                                <div class="bg-primary rounded-2xl rounded-tr-md px-6 py-4 shadow-lg">
-                                                    <p class="text-white text-base leading-relaxed" x-text="message.text"></p>
+                                                <div class="bg-primary rounded-2xl rounded-tr-md px-3 sm:px-4 py-2 sm:py-3 shadow-lg">
+                                                    <p class="text-white text-xs sm:text-sm leading-relaxed" x-text="message.text"></p>
                                                     <!-- Archivos adjuntos -->
                                                     <div x-show="message.files && message.files.length > 0" class="mt-3 pt-3 border-t border-white/20">
                                                         <div class="flex flex-wrap gap-2">
@@ -461,42 +462,42 @@ $page_title = 'Asistente Virtual - ComfaChoco';
             </div>
 
             <!-- Input Area Premium -->
-            <div class="bg-white border-t border-gray-100 px-6 md:px-8 py-6">
+            <div class="bg-white border-t border-gray-100 px-2 sm:px-3 md:px-4 py-2 sm:py-3 md:py-4">
                 <form @submit.prevent="sendMessage()">
                     <!-- Archivos adjuntos -->
-                    <div x-show="attachedFiles.length > 0" class="mb-4">
+                    <div x-show="attachedFiles.length > 0" class="mb-3 sm:mb-4">
                         <div class="flex items-center space-x-2 flex-wrap gap-2">
                             <template x-for="(file, index) in attachedFiles" :key="index">
-                                <div class="flex items-center space-x-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
-                                    <i class="fas fa-file text-blue-600"></i>
-                                    <span class="text-sm font-medium text-gray-700" x-text="file.name"></span>
+                                <div class="flex items-center space-x-2 bg-blue-50 border border-blue-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
+                                    <i class="fas fa-file text-blue-600 text-xs sm:text-sm"></i>
+                                    <span class="text-xs sm:text-sm font-medium text-gray-700" x-text="file.name"></span>
                                     <button type="button" @click="removeFile(index)" class="text-red-500 hover:text-red-700">
-                                        <i class="fas fa-times"></i>
+                                        <i class="fas fa-times text-xs sm:text-sm"></i>
                                     </button>
                                 </div>
                             </template>
                         </div>
                     </div>
 
-                    <div class="flex items-end space-x-4">
+                    <div class="flex items-end space-x-2 sm:space-x-3 md:space-x-4">
                         <div class="flex-1">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Escribe tu consulta:</label>
+                            <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2">Escribe tu consulta:</label>
                             <div class="relative">
                                 <input type="text"
                                        x-model="currentMessage"
                                        placeholder="Ejemplo: Quiero solicitar permisos..."
-                                       class="input-focus w-full px-5 py-4 text-base border-2 border-gray-200 rounded-xl bg-gray-50 focus:bg-white transition-all duration-300"
+                                       class="input-focus w-full px-3 py-2.5 sm:py-3 text-sm border-2 border-gray-200 rounded-lg bg-gray-50 focus:bg-white transition-all duration-300"
                                        autofocus>
-                                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
-                                    <i class="fas fa-keyboard text-xl"></i>
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                    <i class="fas fa-keyboard text-base"></i>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex flex-col space-y-2">
+                        <div class="flex flex-col space-y-1 sm:space-y-2">
                             <button type="button"
                                     @click="$refs.fileInput.click()"
-                                    class="px-4 py-4 bg-gray-100 hover:bg-gray-200 rounded-xl flex items-center justify-center text-gray-600 transition-all duration-300 shadow-md hover:shadow-lg">
-                                <i class="fas fa-paperclip text-xl"></i>
+                                    class="px-3 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center text-gray-600 transition-all duration-300 shadow-md hover:shadow-lg">
+                                <i class="fas fa-paperclip text-base"></i>
                             </button>
                             <input type="file" 
                                    x-ref="fileInput" 
@@ -507,8 +508,8 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                         </div>
                         <button type="submit"
                                 :disabled="!currentMessage.trim() && attachedFiles.length === 0"
-                                class="btn-primary px-8 py-4 text-white font-semibold rounded-xl flex items-center space-x-3 shadow-lg text-base">
-                            <span>Enviar</span>
+                                class="btn-primary px-4 sm:px-6 py-3 text-white font-semibold rounded-lg flex items-center space-x-2 shadow-lg text-sm">
+                            <span class="hidden sm:inline">Enviar</span>
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>
@@ -713,27 +714,27 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                     if ((message.includes('solicitar') || message.includes('pedir') || message.includes('quiero')) &&
                         (message.includes('permiso') || message.includes('vacacion'))) {
                         return `
-                            <p class="text-lg font-semibold mb-4">¡Perfecto! Te ayudaré a solicitar tu permiso 😊</p>
-                            <p class="mb-4">Por favor, selecciona el tipo de permiso que necesitas:</p>
-                            <div class="bg-primary/5 rounded-xl p-5 space-y-3 my-4">
-                                <div data-option="1" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
-                                    <span class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">1</span>
-                                    <span class="font-medium text-lg text-left flex-1">Vacaciones (15 días hábiles/año)</span>
+                            <p class="text-xs sm:text-sm font-semibold mb-1.5">¡Perfecto! Te ayudaré a solicitar tu permiso 😊</p>
+                            <p class="mb-3 text-xs">Por favor, selecciona el tipo de permiso que necesitas:</p>
+                            <div class="bg-primary/5 rounded-xl p-2 sm:p-3 space-y-1.5 sm:space-y-2 my-2">
+                                <div data-option="1" class="permission-option w-full flex items-center space-x-2 p-2 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
+                                    <span class="w-7 h-7 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform text-xs">1</span>
+                                    <span class="font-medium text-sm sm:text-base text-left flex-1">Vacaciones (15 días hábiles/año)</span>
                                     <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                 </div>
-                                <div data-option="2" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
-                                    <span class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">2</span>
-                                    <span class="font-medium text-lg text-left flex-1">Licencia de Paternidad/Maternidad</span>
+                                <div data-option="2" class="permission-option w-full flex items-center space-x-2 p-2 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
+                                    <span class="w-7 h-7 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform text-xs">2</span>
+                                    <span class="font-medium text-sm sm:text-base text-left flex-1">Licencia de Paternidad/Maternidad</span>
                                     <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                 </div>
-                                <div data-option="3" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
-                                    <span class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">3</span>
-                                    <span class="font-medium text-lg text-left flex-1">Permiso Médico</span>
+                                <div data-option="3" class="permission-option w-full flex items-center space-x-2 p-2 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
+                                    <span class="w-7 h-7 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform text-xs">3</span>
+                                    <span class="font-medium text-sm sm:text-base text-left flex-1">Permiso Médico</span>
                                     <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                 </div>
-                                <div data-option="4" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
-                                    <span class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">4</span>
-                                    <span class="font-medium text-lg text-left flex-1">Otras Causas</span>
+                                <div data-option="4" class="permission-option w-full flex items-center space-x-2 p-2 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
+                                    <span class="w-7 h-7 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform text-xs">4</span>
+                                    <span class="font-medium text-sm sm:text-base text-left flex-1">Otras Causas</span>
                                     <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                 </div>
                             </div>
@@ -747,9 +748,9 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                     if (message.includes('saldo') || message.includes('disponible') || message.includes('días') ||
                         message.includes('dias') || message.includes('cuántos') || message.includes('cuantos')) {
                         return `
-                            <p class="text-lg font-semibold mb-4">📊 Aquí está tu saldo actual de permisos:</p>
-                            <div class="space-y-4 my-4">
-                                <div class="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-5 shadow-sm">
+                            <p class="text-xs sm:text-sm font-semibold mb-1.5">📊 Aquí está tu saldo actual de permisos:</p>
+                            <div class="space-y-3 my-3">
+                                <div class="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-2 sm:p-3 shadow-sm">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center space-x-4">
                                             <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
@@ -757,12 +758,12 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                             </div>
                                             <div>
                                                 <p class="text-sm text-gray-600">Vacaciones</p>
-                                                <p class="text-3xl font-bold text-blue-600">15 días</p>
+                                                <p class="text-xl sm:text-base sm:text-lg font-bold text-blue-600">15 días</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-5 shadow-sm">
+                                <div class="bg-green-50 border-l-4 border-green-500 rounded-lg p-2 sm:p-3 shadow-sm">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center space-x-4">
                                             <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
@@ -770,12 +771,12 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                             </div>
                                             <div>
                                                 <p class="text-sm text-gray-600">Licencia de Paternidad</p>
-                                                <p class="text-3xl font-bold text-green-600">15 días</p>
+                                                <p class="text-xl sm:text-base sm:text-lg font-bold text-green-600">15 días</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="bg-purple-50 border-l-4 border-purple-500 rounded-lg p-5 shadow-sm">
+                                <div class="bg-purple-50 border-l-4 border-purple-500 rounded-lg p-2 sm:p-3 shadow-sm">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center space-x-4">
                                             <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
@@ -783,12 +784,12 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                             </div>
                                             <div>
                                                 <p class="text-sm text-gray-600">Licencia de Maternidad</p>
-                                                <p class="text-3xl font-bold text-purple-600">4 meses</p>
+                                                <p class="text-xl sm:text-base sm:text-lg font-bold text-purple-600">4 meses</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-5 shadow-sm">
+                                <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-2 sm:p-3 shadow-sm">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center space-x-4">
                                             <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center">
@@ -796,7 +797,7 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                             </div>
                                             <div>
                                                 <p class="text-sm text-gray-600">Permiso por Enfermedad</p>
-                                                <p class="text-3xl font-bold text-red-600">Con orden médica</p>
+                                                <p class="text-xl sm:text-base sm:text-lg font-bold text-red-600">Con orden médica</p>
                                             </div>
                                         </div>
                                     </div>
@@ -812,26 +813,26 @@ $page_title = 'Asistente Virtual - ComfaChoco';
 
                     if (message.includes('solicitud') || message.includes('estado') || message.includes('revisar')) {
                         return `
-                            <p class="text-lg font-semibold mb-4">📋 Estado de tus solicitudes de permisos:</p>
-                            <div class="space-y-4 my-4">
-                                <div class="bg-green-50 border border-green-200 rounded-xl p-5 shadow-sm">
+                            <p class="text-xs sm:text-sm font-semibold mb-1.5">📋 Estado de tus solicitudes de permisos:</p>
+                            <div class="space-y-3 my-3">
+                                <div class="bg-green-50 border border-green-200 rounded-xl p-2 sm:p-3 shadow-sm">
                                     <div class="flex items-center justify-between mb-3">
                                         <span class="text-lg font-bold text-green-900">✓ Solicitudes Aprobadas</span>
-                                        <span class="text-3xl font-bold text-green-600">3</span>
+                                        <span class="text-xl sm:text-base sm:text-lg font-bold text-green-600">3</span>
                                     </div>
                                     <p class="text-sm text-green-700">Última aprobada: Vacaciones del 15-20 Diciembre 2023</p>
                                 </div>
-                                <div class="bg-orange-50 border border-orange-200 rounded-xl p-5 shadow-sm">
+                                <div class="bg-orange-50 border border-orange-200 rounded-xl p-2 sm:p-3 shadow-sm">
                                     <div class="flex items-center justify-between mb-3">
                                         <span class="text-lg font-bold text-orange-900">⏳ En Revisión</span>
-                                        <span class="text-3xl font-bold text-orange-600">1</span>
+                                        <span class="text-xl sm:text-base sm:text-lg font-bold text-orange-600">1</span>
                                     </div>
                                     <p class="text-sm text-orange-700">Permiso médico por 2 días - En proceso de aprobación</p>
                                 </div>
-                                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5 shadow-sm">
+                                <div class="bg-gray-50 border border-gray-200 rounded-xl p-2 sm:p-3 shadow-sm">
                                     <div class="flex items-center justify-between mb-3">
                                         <span class="text-lg font-bold text-gray-700">✗ Rechazadas</span>
-                                        <span class="text-3xl font-bold text-gray-600">0</span>
+                                        <span class="text-xl sm:text-base sm:text-lg font-bold text-gray-600">0</span>
                                     </div>
                                     <p class="text-sm text-gray-600">¡Excelente! No tienes solicitudes rechazadas</p>
                                 </div>
@@ -846,45 +847,45 @@ $page_title = 'Asistente Virtual - ComfaChoco';
 
                     if (message.includes('política') || message.includes('politica') || message.includes('regla') || message.includes('norma')) {
                         return `
-                            <p class="text-lg font-semibold mb-4">📖 Políticas de Permisos de ComfaChoco:</p>
-                            <div class="bg-primary/5 rounded-xl p-5 space-y-4 my-4">
+                            <p class="text-xs sm:text-sm font-semibold mb-1.5">📖 Políticas de Permisos de ComfaChoco:</p>
+                            <div class="bg-primary/5 rounded-xl p-2 sm:p-3 space-y-1.5 sm:space-y-2 my-2">
                                 <div class="flex items-start space-x-3">
-                                    <i class="fas fa-check-circle text-primary text-xl mt-1"></i>
+                                    <i class="fas fa-check-circle text-primary text-base mt-1"></i>
                                     <div>
                                         <p class="font-semibold text-gray-900 mb-1">Vacaciones:</p>
                                         <p class="text-gray-700">15 días hábiles por período de un año, acumulables hasta 2 períodos. Se solicitan 1 mes posterior al cumplimiento del período. Los sábados cuentan como día hábil.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start space-x-3">
-                                    <i class="fas fa-check-circle text-primary text-xl mt-1"></i>
+                                    <i class="fas fa-check-circle text-primary text-base mt-1"></i>
                                     <div>
                                         <p class="font-semibold text-gray-900 mb-1">Maternidad/Paternidad:</p>
                                         <p class="text-gray-700">Mujeres: 4 meses | Hombres: 15 días. Requiere certificado.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start space-x-3">
-                                    <i class="fas fa-check-circle text-primary text-xl mt-1"></i>
+                                    <i class="fas fa-check-circle text-primary text-base mt-1"></i>
                                     <div>
                                         <p class="font-semibold text-gray-900 mb-1">Permisos Médicos:</p>
                                         <p class="text-gray-700">Requieren órdenes médicas y todos los anexos relacionados con la enfermedad.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start space-x-3">
-                                    <i class="fas fa-check-circle text-primary text-xl mt-1"></i>
+                                    <i class="fas fa-check-circle text-primary text-base mt-1"></i>
                                     <div>
                                         <p class="font-semibold text-gray-900 mb-1">Aprobación:</p>
                                         <p class="text-gray-700">Menos de 2 días: con jefe inmediato | Más de 3 días: con Recursos Humanos</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start space-x-3">
-                                    <i class="fas fa-check-circle text-primary text-xl mt-1"></i>
+                                    <i class="fas fa-check-circle text-primary text-base mt-1"></i>
                                     <div>
                                         <p class="font-semibold text-gray-900 mb-1">Gestión de Reemplazo:</p>
                                         <p class="text-gray-700">70% de funcionarios deben estar disponibles. Personas de la misma dependencia no pueden salir al mismo tiempo.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-start space-x-3">
-                                    <i class="fas fa-check-circle text-primary text-xl mt-1"></i>
+                                    <i class="fas fa-check-circle text-primary text-base mt-1"></i>
                                     <div>
                                         <p class="font-semibold text-gray-900 mb-1">Otras Causas:</p>
                                         <p class="text-gray-700">Incluye: muerte de familiar (certificado de defunción), miembro/jurado (documento acreditativo), y otras con anexo correspondiente</p>
@@ -898,33 +899,33 @@ $page_title = 'Asistente Virtual - ComfaChoco';
 
                     if (message.includes('1') || message.includes('vacaciones')) {
                         return `
-                            <p class="text-lg font-semibold mb-4">🏖️ Solicitud de Vacaciones</p>
-                            <p class="mb-3">Actualmente tienes <strong class="text-primary text-xl">15 días disponibles</strong> para tomar.</p>
-                            <div class="bg-blue-50 rounded-xl p-5 my-4">
-                                <p class="font-semibold mb-3">Selecciona las fechas de tus vacaciones:</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <p class="text-xs sm:text-sm font-semibold mb-1.5">🏖️ Solicitud de Vacaciones</p>
+                            <p class="mb-1.5 text-xs">Tienes <strong class="text-primary text-xs">15 días disponibles</strong> para tomar.</p>
+                            <div class="bg-blue-50 rounded-xl p-2 sm:p-3 my-2">
+                                <p class="font-semibold mb-1.5 text-xs">Selecciona las fechas de tus vacaciones:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-0.5">
                                             <i class="fas fa-calendar-alt text-blue-600 mr-2"></i>
                                             Fecha de inicio
                                         </label>
-                                        <input type="date" id="fecha-inicio" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin').min = this.value; calcularDiasVacaciones();">
+                                        <input type="date" id="fecha-inicio" class="w-full px-2 py-1.5 border-2 text-xs border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin').min = this.value; calcularDiasVacaciones();">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-0.5">
                                             <i class="fas fa-calendar-check text-blue-600 mr-2"></i>
                                             Fecha de fin
                                         </label>
-                                        <input type="date" id="fecha-fin" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasVacaciones()">
+                                        <input type="date" id="fecha-fin" class="w-full px-2 py-1.5 border-2 text-xs border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasVacaciones()">
                                     </div>
                                 </div>
-                                <div id="dias-resultado" class="mt-3 px-4 py-2 bg-blue-100 border border-blue-300 rounded-lg text-center hidden">
-                                    <p class="text-sm font-semibold text-blue-800">
+                                <div id="dias-resultado" class="mt-2 px-2 py-1.5 bg-blue-100 border border-blue-300 rounded-lg text-center hidden">
+                                    <p class="text-xs font-semibold text-blue-800">
                                         <i class="fas fa-calendar-week mr-2"></i>
                                         <span id="dias-texto">0 días</span> de vacaciones solicitados
                                     </p>
                                 </div>
-                                <button onclick="procesarVacaciones()" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
+                                <button onclick="procesarVacaciones()" class="mt-1.5 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
                                     <i class="fas fa-paper-plane mr-2"></i>
                                     Enviar Solicitud de Vacaciones
                                 </button>
@@ -944,17 +945,17 @@ $page_title = 'Asistente Virtual - ComfaChoco';
 
                     if (message.includes('2') || message.includes('licencia') && !message.includes('paternidad') && !message.includes('maternidad')) {
                         return `
-                            <p class="text-lg font-semibold mb-4">👨‍👶👩‍👶 Licencia de Paternidad/Maternidad</p>
-                            <p class="mb-4">Por favor, selecciona el tipo de licencia que necesitas:</p>
-                            <div class="bg-primary/5 rounded-xl p-5 space-y-3 my-4">
-                                <div data-option="paternidad" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
-                                    <span class="w-8 h-8 bg-green-500 text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">P</span>
-                                    <span class="font-medium text-lg text-left flex-1">Licencia de Paternidad (15 días)</span>
+                            <p class="text-xs sm:text-sm font-semibold mb-1.5">👨‍👶👩‍👶 Licencia de Paternidad/Maternidad</p>
+                            <p class="mb-3">Por favor, selecciona el tipo de licencia que necesitas:</p>
+                            <div class="bg-primary/5 rounded-xl p-2 sm:p-3 space-y-1.5 sm:space-y-2 my-2">
+                                <div data-option="paternidad" class="permission-option w-full flex items-center space-x-2 p-2 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
+                                    <span class="w-7 h-7 bg-green-500 text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform text-xs">P</span>
+                                    <span class="font-medium text-sm sm:text-base text-left flex-1">Licencia de Paternidad (15 días)</span>
                                     <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                 </div>
-                                <div data-option="maternidad" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
-                                    <span class="w-8 h-8 bg-purple-500 text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">M</span>
-                                    <span class="font-medium text-lg text-left flex-1">Licencia de Maternidad (4 meses)</span>
+                                <div data-option="maternidad" class="permission-option w-full flex items-center space-x-2 p-2 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
+                                    <span class="w-7 h-7 bg-purple-500 text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform text-xs">M</span>
+                                    <span class="font-medium text-sm sm:text-base text-left flex-1">Licencia de Maternidad (4 meses)</span>
                                     <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                 </div>
                             </div>
@@ -967,56 +968,56 @@ $page_title = 'Asistente Virtual - ComfaChoco';
 
                     if (message.includes('paternidad')) {
                         return `
-                            <p class="text-lg font-semibold mb-4">👨‍👶 Licencia de Paternidad</p>
-                            <p class="mb-3">Tienes derecho a <strong class="text-primary text-xl">15 días</strong> de licencia de paternidad.</p>
-                            <div class="bg-green-50 rounded-xl p-5 my-4">
-                                <p class="font-semibold mb-3">Selecciona las fechas de tu licencia:</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <p class="text-xs sm:text-sm font-semibold mb-1.5">👨‍👶 Licencia de Paternidad</p>
+                            <p class="mb-1.5 text-xs">Tienes derecho a <strong class="text-primary text-xs">15 días</strong> de licencia de paternidad.</p>
+                            <div class="bg-green-50 rounded-xl p-2 sm:p-3 my-2">
+                                <p class="font-semibold mb-1.5 text-xs">Selecciona las fechas de tu licencia:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-0.5">
                                             <i class="fas fa-calendar-alt text-green-600 mr-2"></i>
                                             Fecha de inicio
                                         </label>
-                                        <input type="date" id="fecha-inicio-paternidad" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin-paternidad').min = this.value; calcularDiasLicencia('paternidad');">
+                                        <input type="date" id="fecha-inicio-paternidad" class="w-full px-2 py-1.5 border-2 text-xs border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin-paternidad').min = this.value; calcularDiasLicencia('paternidad');">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-0.5">
                                             <i class="fas fa-calendar-check text-green-600 mr-2"></i>
                                             Fecha de fin
                                         </label>
-                                        <input type="date" id="fecha-fin-paternidad" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasLicencia('paternidad');">
+                                        <input type="date" id="fecha-fin-paternidad" class="w-full px-2 py-1.5 border-2 text-xs border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasLicencia('paternidad');">
                                     </div>
                                 </div>
-                                <div id="dias-resultado-paternidad" class="mt-3 px-4 py-2 bg-green-100 border border-green-300 rounded-lg text-center hidden">
-                                    <p class="text-sm font-semibold text-green-800">
+                                <div id="dias-resultado-paternidad" class="mt-2 px-2 py-1.5 bg-green-100 border border-green-300 rounded-lg text-center hidden">
+                                    <p class="text-xs font-semibold text-green-800">
                                         <i class="fas fa-calendar-week mr-2"></i>
                                         <span id="dias-texto-paternidad">0 días</span> de licencia solicitados
                                     </p>
                                 </div>
                                 <div class="mt-4">
-                                    <p class="font-semibold mb-3">Documentos necesarios:</p>
+                                    <p class="font-semibold mb-2 text-xs">Documentos necesarios:</p>
                                     <ul class="space-y-2 mb-3">
                                     <li class="flex items-center space-x-2">
                                             <i class="fas fa-certificate text-green-600"></i>
                                             <span>Certificado de nacimiento o adopción</span>
                                     </li>
                                     </ul>
-                                    <div class="border-2 border-dashed border-green-300 rounded-lg p-4 bg-green-50/50">
+                                    <div class="border-2 border-dashed border-green-300 rounded-lg p-2 bg-green-50/50">
                                         <label class="flex flex-col items-center justify-center cursor-pointer">
                                             <input type="file" 
                                                    id="archivo-paternidad" 
                                                    onchange="handleFileSelectLicencia('paternidad', this)"
                                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                                                    class="hidden">
-                                            <i class="fas fa-cloud-upload-alt text-green-600 text-3xl mb-2"></i>
-                                            <span class="text-sm font-medium text-gray-700">Adjuntar certificado</span>
-                                            <span class="text-xs text-gray-500 mt-1">PDF, JPG, PNG, DOC o DOCX (máx. 5MB)</span>
+                                            <i class="fas fa-cloud-upload-alt text-green-600 text-xl mb-1"></i>
+                                            <span class="text-xs font-medium text-gray-700">Adjuntar certificado</span>
+                                            <span class="text-xs text-gray-500 mt-0.5">PDF, JPG, PNG, DOCX (máx. 5MB)</span>
                                         </label>
                                     </div>
                                     <div id="archivos-paternidad" class="mt-3 flex flex-wrap gap-2"></div>
                                 </div>
-                                <button onclick="procesarLicencia('paternidad')" class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
-                                    <i class="fas fa-paper-plane mr-2"></i>
+                                <button onclick="procesarLicencia('paternidad')" class="mt-1.5 w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-1.5 px-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg text-xs">
+                                    <i class="fas fa-paper-plane mr-1.5"></i>
                                     Enviar Solicitud
                                 </button>
                             </div>
@@ -1025,56 +1026,56 @@ $page_title = 'Asistente Virtual - ComfaChoco';
 
                     if (message.includes('maternidad')) {
                         return `
-                            <p class="text-lg font-semibold mb-4">👩‍👶 Licencia de Maternidad</p>
-                            <p class="mb-3">Tienes derecho a <strong class="text-primary text-xl">4 meses</strong> de licencia de maternidad.</p>
-                            <div class="bg-purple-50 rounded-xl p-5 my-4">
-                                <p class="font-semibold mb-3">Selecciona las fechas de tu licencia:</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <p class="text-xs sm:text-sm font-semibold mb-1.5">👩‍👶 Licencia de Maternidad</p>
+                            <p class="mb-1.5 text-xs">Tienes derecho a <strong class="text-primary text-xs">4 meses</strong> de licencia de maternidad.</p>
+                            <div class="bg-purple-50 rounded-xl p-2 sm:p-3 my-2">
+                                <p class="font-semibold mb-1.5 text-xs">Selecciona las fechas de tu licencia:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-0.5">
                                             <i class="fas fa-calendar-alt text-purple-600 mr-2"></i>
                                             Fecha de inicio
                                         </label>
-                                        <input type="date" id="fecha-inicio-maternidad" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin-maternidad').min = this.value; calcularDiasLicencia('maternidad');">
+                                        <input type="date" id="fecha-inicio-maternidad" class="w-full px-2 py-1.5 border-2 text-xs border-gray-300 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin-maternidad').min = this.value; calcularDiasLicencia('maternidad');">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-0.5">
                                             <i class="fas fa-calendar-check text-purple-600 mr-2"></i>
                                             Fecha de fin
                                         </label>
-                                        <input type="date" id="fecha-fin-maternidad" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasLicencia('maternidad');">
+                                        <input type="date" id="fecha-fin-maternidad" class="w-full px-2 py-1.5 border-2 text-xs border-gray-300 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasLicencia('maternidad');">
                                     </div>
                                 </div>
-                                <div id="dias-resultado-maternidad" class="mt-3 px-4 py-2 bg-purple-100 border border-purple-300 rounded-lg text-center hidden">
-                                    <p class="text-sm font-semibold text-purple-800">
+                                <div id="dias-resultado-maternidad" class="mt-2 px-2 py-1.5 bg-purple-100 border border-purple-300 rounded-lg text-center hidden">
+                                    <p class="text-xs font-semibold text-purple-800">
                                         <i class="fas fa-calendar-week mr-2"></i>
                                         <span id="dias-texto-maternidad">0 días</span> de licencia solicitados
                                     </p>
                                 </div>
                                 <div class="mt-4">
-                                    <p class="font-semibold mb-3">Documentos necesarios:</p>
+                                    <p class="font-semibold mb-2 text-xs">Documentos necesarios:</p>
                                     <ul class="space-y-2 mb-3">
                                     <li class="flex items-center space-x-2">
                                             <i class="fas fa-certificate text-purple-600"></i>
                                             <span>Certificado de nacimiento o adopción</span>
                                     </li>
                                 </ul>
-                                    <div class="border-2 border-dashed border-purple-300 rounded-lg p-4 bg-purple-50/50">
+                                    <div class="border-2 border-dashed border-purple-300 rounded-lg p-2 bg-purple-50/50">
                                         <label class="flex flex-col items-center justify-center cursor-pointer">
                                             <input type="file" 
                                                    id="archivo-maternidad" 
                                                    onchange="handleFileSelectLicencia('maternidad', this)"
                                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                                                    class="hidden">
-                                            <i class="fas fa-cloud-upload-alt text-purple-600 text-3xl mb-2"></i>
-                                            <span class="text-sm font-medium text-gray-700">Adjuntar certificado</span>
-                                            <span class="text-xs text-gray-500 mt-1">PDF, JPG, PNG, DOC o DOCX (máx. 5MB)</span>
+                                            <i class="fas fa-cloud-upload-alt text-purple-600 text-xl mb-1"></i>
+                                            <span class="text-xs font-medium text-gray-700">Adjuntar certificado</span>
+                                            <span class="text-xs text-gray-500 mt-0.5">PDF, JPG, PNG, DOCX (máx. 5MB)</span>
                                         </label>
                             </div>
                                     <div id="archivos-maternidad" class="mt-3 flex flex-wrap gap-2"></div>
                                 </div>
-                                <button onclick="procesarLicencia('maternidad')" class="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
-                                    <i class="fas fa-paper-plane mr-2"></i>
+                                <button onclick="procesarLicencia('maternidad')" class="mt-1.5 w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-1.5 px-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg text-xs">
+                                    <i class="fas fa-paper-plane mr-1.5"></i>
                                     Enviar Solicitud
                                 </button>
                             </div>
@@ -1083,24 +1084,24 @@ $page_title = 'Asistente Virtual - ComfaChoco';
 
                     if (message.includes('3') || message.includes('enfermedad') || message.includes('médico') || message.includes('medico')) {
                         return `
-                            <p class="text-lg font-semibold mb-4">🏥 Permiso Médico</p>
-                            <p class="mb-3">Este permiso requiere documentación médica completa.</p>
-                            <div class="bg-red-50 rounded-xl p-5 my-4">
-                                <p class="font-semibold mb-3">Selecciona las fechas del permiso:</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <p class="text-xs sm:text-sm font-semibold mb-1.5">🏥 Permiso Médico</p>
+                            <p class="mb-1.5 text-xs">Este permiso requiere documentación médica completa.</p>
+                            <div class="bg-red-50 rounded-xl p-2 sm:p-3 my-2">
+                                <p class="font-semibold mb-1.5 text-xs">Selecciona las fechas del permiso:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-0.5">
                                             <i class="fas fa-calendar-alt text-red-600 mr-2"></i>
                                             Fecha de inicio
                                         </label>
-                                        <input type="date" id="fecha-inicio-medico" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin-medico').min = this.value; calcularDiasLicencia('medico');">
+                                        <input type="date" id="fecha-inicio-medico" class="w-full px-2 py-1.5 border-2 text-xs border-gray-300 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin-medico').min = this.value; calcularDiasLicencia('medico');">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-0.5">
                                             <i class="fas fa-calendar-check text-red-600 mr-2"></i>
                                             Fecha de fin
                                         </label>
-                                        <input type="date" id="fecha-fin-medico" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasLicencia('medico');">
+                                        <input type="date" id="fecha-fin-medico" class="w-full px-2 py-1.5 border-2 text-xs border-gray-300 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasLicencia('medico');">
                                     </div>
                                 </div>
                                 <div id="dias-resultado-medico" class="mb-4 px-4 py-2 bg-red-100 border border-red-300 rounded-lg text-center hidden">
@@ -1109,7 +1110,7 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                         <span id="dias-texto-medico">0 días</span> de permiso solicitados
                                     </p>
                                 </div>
-                                <p class="font-semibold mb-3">Documentos necesarios:</p>
+                                <p class="font-semibold mb-2 text-xs">Documentos necesarios:</p>
                                 <ul class="space-y-2 mb-3">
                                     <li class="flex items-center space-x-2">
                                         <i class="fas fa-file-medical text-red-600"></i>
@@ -1120,7 +1121,7 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                         <span>Todos los anexos relacionados con la enfermedad</span>
                                     </li>
                                 </ul>
-                                <div class="border-2 border-dashed border-red-300 rounded-lg p-4 bg-red-50/50">
+                                <div class="border-2 border-dashed border-red-300 rounded-lg p-2 bg-red-50/50">
                                     <label class="flex flex-col items-center justify-center cursor-pointer">
                                         <input type="file" 
                                                id="archivo-medico" 
@@ -1129,13 +1130,13 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                                multiple
                                                class="hidden">
                                         <i class="fas fa-cloud-upload-alt text-red-600 text-3xl mb-2"></i>
-                                        <span class="text-sm font-medium text-gray-700">Adjuntar documentos médicos</span>
-                                        <span class="text-xs text-gray-500 mt-1">PDF, JPG, PNG, DOC o DOCX (máx. 5MB)</span>
+                                        <span class="text-xs font-medium text-gray-700">Adjuntar documentos médicos</span>
+                                        <span class="text-xs text-gray-500 mt-0.5">PDF, JPG, PNG, DOCX (máx. 5MB)</span>
                                     </label>
                             </div>
                                 <div id="archivos-medico" class="mt-3 flex flex-wrap gap-2"></div>
-                                <button onclick="procesarPermisoMedico()" class="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
-                                    <i class="fas fa-paper-plane mr-2"></i>
+                                <button onclick="procesarPermisoMedico()" class="mt-1.5 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-1.5 px-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg text-xs">
+                                    <i class="fas fa-paper-plane mr-1.5"></i>
                                     Enviar Solicitud
                                 </button>
                             </div>
@@ -1150,17 +1151,17 @@ $page_title = 'Asistente Virtual - ComfaChoco';
 
                     if (message.includes('4') || message.includes('otras') || message.includes('otra')) {
                         return `
-                            <p class="text-lg font-semibold mb-4">📋 Otras Causas</p>
-                            <p class="mb-4">Selecciona el tipo específico de permiso:</p>
-                            <div class="bg-primary/5 rounded-xl p-5 space-y-3 my-4">
-                                <div data-option="muerte-familiar" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
-                                    <span class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">A</span>
-                                    <span class="font-medium text-lg text-left flex-1">Permiso por Muerte de Familiar</span>
+                            <p class="text-xs sm:text-sm font-semibold mb-1.5">📋 Otras Causas</p>
+                            <p class="mb-3">Selecciona el tipo específico de permiso:</p>
+                            <div class="bg-primary/5 rounded-xl p-2 sm:p-3 space-y-1.5 sm:space-y-2 my-2">
+                                <div data-option="muerte-familiar" class="permission-option w-full flex items-center space-x-2 p-2 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
+                                    <span class="w-7 h-7 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform text-xs">A</span>
+                                    <span class="font-medium text-sm sm:text-base text-left flex-1">Permiso por Muerte de Familiar</span>
                                     <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                             </div>
-                                <div data-option="miembro-jurado" class="permission-option w-full flex items-center space-x-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
-                                    <span class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform">B</span>
-                                    <span class="font-medium text-lg text-left flex-1">Permiso Miembro/Jurado</span>
+                                <div data-option="miembro-jurado" class="permission-option w-full flex items-center space-x-2 p-2 bg-white rounded-lg shadow-sm hover:shadow-lg hover:bg-primary/5 hover:border-2 hover:border-primary transition-all duration-300 cursor-pointer group" style="user-select: none;">
+                                    <span class="w-7 h-7 bg-primary text-white rounded-lg flex items-center justify-center font-bold group-hover:scale-110 transition-transform text-xs">B</span>
+                                    <span class="font-medium text-sm sm:text-base text-left flex-1">Permiso Miembro/Jurado</span>
                                     <i class="fas fa-chevron-right text-primary opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                 </div>
                             </div>
@@ -1173,36 +1174,36 @@ $page_title = 'Asistente Virtual - ComfaChoco';
 
                     if (message.includes('muerte') || message.includes('familiar') || message.includes('certificado defunción')) {
                         return `
-                            <p class="text-lg font-semibold mb-4">💔 Permiso por Muerte de Familiar</p>
-                            <p class="mb-3">Este permiso es para situaciones de duelo.</p>
-                            <div class="bg-gray-50 rounded-xl p-5 my-4">
-                                <p class="font-semibold mb-3">Selecciona las fechas de tu permiso:</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <p class="text-xs sm:text-sm font-semibold mb-1.5">💔 Permiso por Muerte de Familiar</p>
+                            <p class="mb-1.5 text-xs">Este permiso es para situaciones de duelo.</p>
+                            <div class="bg-gray-50 rounded-xl p-2 sm:p-3 my-2">
+                                <p class="font-semibold mb-1.5 text-xs">Selecciona las fechas de tu permiso:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-0.5">
                                             <i class="fas fa-calendar-alt text-gray-600 mr-2"></i>
                                             Fecha de inicio
                                         </label>
-                                        <input type="date" id="fecha-inicio-muerte" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin-muerte').min = this.value; calcularDiasLicencia('muerte');">
+                                        <input type="date" id="fecha-inicio-muerte" class="w-full px-2 py-1.5 border-2 text-xs border-gray-300 rounded-lg focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin-muerte').min = this.value; calcularDiasLicencia('muerte');">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-0.5">
                                             <i class="fas fa-calendar-check text-gray-600 mr-2"></i>
                                             Fecha de fin
                                         </label>
-                                        <input type="date" id="fecha-fin-muerte" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasLicencia('muerte');">
+                                        <input type="date" id="fecha-fin-muerte" class="w-full px-2 py-1.5 border-2 text-xs border-gray-300 rounded-lg focus:border-gray-500 focus:ring-2 focus:ring-gray-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasLicencia('muerte');">
                                     </div>
                                 </div>
-                                <div id="dias-resultado-muerte" class="mt-3 px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-center hidden">
-                                    <p class="text-sm font-semibold text-gray-800">
+                                <div id="dias-resultado-muerte" class="mt-2 px-2 py-1.5 bg-gray-100 border border-gray-300 rounded-lg text-center hidden">
+                                    <p class="text-xs font-semibold text-gray-800">
                                         <i class="fas fa-calendar-week mr-2"></i>
                                         <span id="dias-texto-muerte">0 días</span> de permiso solicitados
                                     </p>
                                 </div>
                                 <div class="mt-4">
-                                    <p class="font-semibold mb-3">Documentos necesarios:</p>
-                                    <ul class="space-y-2 mb-3">
-                                        <li class="flex items-center space-x-2">
+                                    <p class="font-semibold mb-2 text-xs">Documentos necesarios:</p>
+                                    <ul class="space-y-1.5 mb-2">
+                                        <li class="flex items-center space-x-1.5">
                                             <i class="fas fa-certificate text-gray-600"></i>
                                             <span>Certificado de defunción</span>
                                     </li>
@@ -1211,8 +1212,8 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                             <span>Certificado de parentesco</span>
                                     </li>
                                 </ul>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50/50">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-2 bg-gray-50/50">
                                             <label class="flex flex-col items-center justify-center cursor-pointer">
                                                 <input type="file" 
                                                        id="archivo-defuncion" 
@@ -1221,10 +1222,10 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                                        class="hidden">
                                                 <i class="fas fa-cloud-upload-alt text-gray-600 text-3xl mb-2"></i>
                                                 <span class="text-sm font-medium text-gray-700">Certificado de defunción</span>
-                                                <span class="text-xs text-gray-500 mt-1">PDF, JPG, PNG, DOC o DOCX (máx. 5MB)</span>
+                                                <span class="text-xs text-gray-500 mt-0.5">PDF, JPG, PNG, DOCX (máx. 5MB)</span>
                                             </label>
                                         </div>
-                                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 bg-gray-50/50">
+                                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-2 bg-gray-50/50">
                                             <label class="flex flex-col items-center justify-center cursor-pointer">
                                                 <input type="file" 
                                                        id="archivo-parentesco" 
@@ -1233,15 +1234,15 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                                        class="hidden">
                                                 <i class="fas fa-cloud-upload-alt text-gray-600 text-3xl mb-2"></i>
                                                 <span class="text-sm font-medium text-gray-700">Certificado de parentesco</span>
-                                                <span class="text-xs text-gray-500 mt-1">PDF, JPG, PNG, DOC o DOCX (máx. 5MB)</span>
+                                                <span class="text-xs text-gray-500 mt-0.5">PDF, JPG, PNG, DOCX (máx. 5MB)</span>
                                             </label>
                                         </div>
                                     </div>
                                     <div id="archivos-defuncion" class="mt-3 flex flex-wrap gap-2"></div>
                                     <div id="archivos-parentesco" class="mt-2 flex flex-wrap gap-2"></div>
                                 </div>
-                                <button onclick="procesarLicencia('muerte')" class="mt-4 w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
-                                    <i class="fas fa-paper-plane mr-2"></i>
+                                <button onclick="procesarLicencia('muerte')" class="mt-1.5 w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-1.5 px-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg text-xs">
+                                    <i class="fas fa-paper-plane mr-1.5"></i>
                                     Enviar Solicitud
                                 </button>
                             </div>
@@ -1250,27 +1251,27 @@ $page_title = 'Asistente Virtual - ComfaChoco';
 
                     if (message.includes('miembro') || message.includes('jurado')) {
                         return `
-                            <p class="text-lg font-semibold mb-4">⚖️ Permiso por Miembro/Jurado</p>
-                            <p class="mb-3">Este permiso es para funciones como miembro de jurado o similar.</p>
-                            <div class="bg-indigo-50 rounded-xl p-5 my-4">
-                                <p class="font-semibold mb-3">Selecciona las fechas de tu permiso:</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <p class="text-xs sm:text-sm font-semibold mb-1.5">⚖️ Permiso por Miembro/Jurado</p>
+                            <p class="mb-1.5 text-xs">Este permiso es para funciones como miembro de jurado o similar.</p>
+                            <div class="bg-indigo-50 rounded-xl p-2 sm:p-3 my-2">
+                                <p class="font-semibold mb-1.5 text-xs">Selecciona las fechas de tu permiso:</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-0.5">
                                             <i class="fas fa-calendar-alt text-indigo-600 mr-2"></i>
                                             Fecha de inicio
                                         </label>
-                                        <input type="date" id="fecha-inicio-jurado" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin-jurado').min = this.value; calcularDiasLicencia('jurado');">
+                                        <input type="date" id="fecha-inicio-jurado" class="w-full px-2 py-1.5 border-2 text-xs border-gray-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="document.getElementById('fecha-fin-jurado').min = this.value; calcularDiasLicencia('jurado');">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <label class="block text-xs font-medium text-gray-700 mb-0.5">
                                             <i class="fas fa-calendar-check text-indigo-600 mr-2"></i>
                                             Fecha de fin
                                         </label>
-                                        <input type="date" id="fecha-fin-jurado" class="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasLicencia('jurado');">
+                                        <input type="date" id="fecha-fin-jurado" class="w-full px-2 py-1.5 border-2 text-xs border-gray-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all" min="${new Date().toISOString().split('T')[0]}" onchange="calcularDiasLicencia('jurado');">
                                     </div>
                                 </div>
-                                <div id="dias-resultado-jurado" class="mt-3 px-4 py-2 bg-indigo-100 border border-indigo-300 rounded-lg text-center hidden">
+                                <div id="dias-resultado-jurado" class="mt-2 px-2 py-1.5 bg-indigo-100 border border-indigo-300 rounded-lg text-center hidden">
                                     <p class="text-sm font-semibold text-indigo-800">
                                         <i class="fas fa-calendar-week mr-2"></i>
                                         <span id="dias-texto-jurado">0 días</span> de permiso solicitados
@@ -1278,28 +1279,28 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                                 </div>
                                 <div class="mt-4">
                                     <p class="font-semibold mb-3">Documento necesario:</p>
-                                    <ul class="space-y-2 mb-3">
-                                        <li class="flex items-center space-x-2">
+                                    <ul class="space-y-1.5 mb-2">
+                                        <li class="flex items-center space-x-1.5">
                                             <i class="fas fa-file-alt text-indigo-600"></i>
                                             <span>Documento que acredite la función</span>
                                         </li>
                                     </ul>
-                                    <div class="border-2 border-dashed border-indigo-300 rounded-lg p-4 bg-indigo-50/50">
+                                    <div class="border-2 border-dashed border-indigo-300 rounded-lg p-2 bg-indigo-50/50">
                                         <label class="flex flex-col items-center justify-center cursor-pointer">
                                             <input type="file" 
                                                    id="archivo-jurado" 
                                                    onchange="handleFileSelectLicencia('jurado', this)"
                                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                                                    class="hidden">
-                                            <i class="fas fa-cloud-upload-alt text-indigo-600 text-3xl mb-2"></i>
-                                            <span class="text-sm font-medium text-gray-700">Adjuntar documento</span>
-                                            <span class="text-xs text-gray-500 mt-1">PDF, JPG, PNG, DOC o DOCX (máx. 5MB)</span>
+                                            <i class="fas fa-cloud-upload-alt text-indigo-600 text-xl mb-1"></i>
+                                            <span class="text-xs font-medium text-gray-700">Adjuntar documento</span>
+                                            <span class="text-xs text-gray-500 mt-0.5">PDF, JPG, PNG, DOCX (máx. 5MB)</span>
                                         </label>
                                     </div>
                                     <div id="archivos-jurado" class="mt-3 flex flex-wrap gap-2"></div>
                                 </div>
-                                <button onclick="procesarLicencia('jurado')" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
-                                    <i class="fas fa-paper-plane mr-2"></i>
+                                <button onclick="procesarLicencia('jurado')" class="mt-1.5 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1.5 px-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg text-xs">
+                                    <i class="fas fa-paper-plane mr-1.5"></i>
                                     Enviar Solicitud
                                 </button>
                             </div>
