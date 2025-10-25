@@ -412,12 +412,15 @@ El objetivo es ofrecer una experiencia intuitiva y agradable, facilitando el acc
 
 El inicio de sesión se realiza mediante el número de cédula del usuario, garantizando un proceso rápido y sencillo.
 
-<p align="center"> <img src="assets/images/interfas_usuario_1.png" alt="Pantalla de inicio de sesión de ComfaChoco" width="600"> </p>
+![Pantalla de inicio de sesión de ComfaChoco](assets/images/interfas_usuario_1.png)
+
 
 Una vez dentro del sistema, el usuario podrá interactuar con un chatbot asistente, el cual lo guiará paso a paso en la gestión de sus solicitudes, como permisos, vacaciones y otras peticiones relacionadas con el área de recursos humanos.
 
 <p align="center"> <img src="assets/images/interfas_usuario_2.png" alt="Chatbot asistente de ComfaChoco" width="600"> </p>
 
+
+![Chatbot asistente de ComfaChoco](assets/images/interfas_usuario_2.png)
 
 
 ## 4.2 Administrador
@@ -428,22 +431,22 @@ Desde este módulo, los administradores pueden gestionar empleados, solicitudes,
 La interfaz presenta un dashboard principal con indicadores clave (KPIs) que resumen el estado actual de la organización: número de empleados, solicitudes pendientes, permisos aprobados y estadísticas de actividad reciente.
 
 
-<p align="center"> <img src="assets/images/dashboar.png" alt="Dashboard administrativo de ComfaChoco" width="600"> </p>  
+![Dashboard administrativo de ComfaChoco](assets/images/dashboar.png)
 
 
 Solicitudes 
 
 
-<p align="center"> <img src="assets/images/Solicitudes.png" alt="Solicitudes administrativo de ComfaChoco" width="600"> </p>  
+![Solicitudes administrativo de ComfaChoco](assets/images/Solicitudes.png)
 
 
 Calendario
 
-<p align="center"> <img src="assets/images/Calendario.png" alt="Calendario administrativo de ComfaChoco" width="600"> </p>  
+![Calendario administrativo de ComfaChoco](assets/images/Calendario.png)
 
 Politicas
 
-<p align="center"> <img src="assets/images/politicas.png" alt="Politicas administrativo de ComfaChoco" width="600"> </p>  
+![Politicas administrativo de ComfaChoco](assets/images/politicas.png)
 
 
 ## Soporte
