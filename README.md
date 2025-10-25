@@ -1,6 +1,6 @@
 # ComfaChoco - Sistema de Gestión de Recursos Humanos
 
-Sistema integral de gestión de recursos humanos para ComfaChoco, desarrollado con PHP 8.2, MySQL y TailwindCSS. 
+Sistema integral de gestión de recursos humanos para ComfaChoco, desarrollado con PHP 8.2, MySQL y TailwindCSS.
 Gestiona empleados, vacaciones, permisos y políticas organizacionales de manera eficiente y segura.
 
 ## Características Principales
@@ -21,6 +21,7 @@ Gestiona empleados, vacaciones, permisos y políticas organizacionales de manera
 - Node.js y npm (para assets)
 
 ### Extensiones PHP Requeridas
+
 - mysqli
 - session
 - json
@@ -49,16 +50,19 @@ Comfachoco/
 ## Instalación Rápida
 
 1. **Clonar el repositorio:**
+
 ```bash
 git clone https://github.com/Bello2005/Comfachoco.git
 cd Comfachoco
 ```
 
 2. **Configurar el servidor web:**
+
 - Copiar el proyecto a tu directorio web (ej: /opt/lampp/htdocs/ para XAMPP)
 - Configurar el virtual host (opcional pero recomendado)
 
 3. **Configurar la base de datos:**
+
 ```bash
 # Acceder a MySQL
 mysql -u root -p
@@ -71,6 +75,7 @@ mysql -u root -p comfachoco < comfachoco.sql
 ```
 
 4. **Configurar el entorno:**
+
 ```bash
 # Copiar el archivo de configuración
 cp config/env.example.php config/env.php
@@ -79,6 +84,7 @@ cp config/env.example.php config/env.php
 ```
 
 5. **Compilar los assets (si se modifican los estilos):**
+
 ```bash
 # Instalar dependencias
 npm install
@@ -112,32 +118,37 @@ Ejemplo de configuración:
 <VirtualHost *:80>
     ServerName comfachoco.local
     DocumentRoot "/opt/lampp/htdocs/Comfachoco"
-    
+
     <Directory "/opt/lampp/htdocs/Comfachoco">
         Options Indexes FollowSymLinks
         AllowOverride All
         Require all granted
     </Directory>
-    
+
     ErrorLog "logs/comfachoco-error.log"
     CustomLog "logs/comfachoco-access.log" combined
 </VirtualHost>
 ```
+
 source /opt/lampp/htdocs/Comfachoco/database.sql
 
 # O desde phpMyAdmin:
+
 # - Crear base de datos 'comfachoco'
+
 # - Importar el archivo database.sql
-```
+
+````
 
 ### 3. Iniciar el Servidor
 
 #### Con XAMPP/LAMPP:
 ```bash
 sudo /opt/lampp/lampp start
-```
+````
 
 #### Con PHP Built-in Server:
+
 ```bash
 cd /opt/lampp/htdocs/Comfachoco
 php -S localhost:8000
@@ -146,17 +157,21 @@ php -S localhost:8000
 ### 4. Acceder a la Aplicación
 
 Abre tu navegador y visita:
+
 - **Con XAMPP/LAMPP**: `http://localhost/Comfachoco/`
 - **Con PHP Built-in**: `http://localhost:8000/`
 
 ## Credenciales de Acceso
 
 ### Usuario Administrador:
+
 - **Email**: admin@comfachoco.com
 - **Contraseña**: admin123
 
 ### Otros usuarios de prueba:
+
 Todos los usuarios de prueba tienen la misma contraseña: `admin123`
+
 - carlos.ruiz@comfachoco.com
 - ana.mendoza@comfachoco.com
 - david.torres@comfachoco.com
@@ -192,18 +207,22 @@ Todos los usuarios de prueba tienen la misma contraseña: `admin123`
 ## Estructura de la Base de Datos
 
 ### Tabla: usuarios
+
 - Almacena información de los usuarios del sistema
 - Roles: admin, gerente, empleado
 
 ### Tabla: solicitudes
+
 - Gestiona solicitudes de vacaciones, permisos, etc.
 - Estados: pendiente, aprobado, rechazado
 - Prioridades: alta, media, baja
 
 ### Tabla: actividad
+
 - Registra la actividad reciente del sistema
 
 ### Tabla: eventos
+
 - Almacena eventos del calendario
 
 ## Desarrollo
@@ -212,6 +231,7 @@ Todos los usuarios de prueba tienen la misma contraseña: `admin123`
 
 1. Crear el archivo en la carpeta `pages/`
 2. Incluir los archivos de configuración necesarios:
+
 ```php
 <?php
 require_once __DIR__ . '/../config/session.php';
@@ -257,6 +277,7 @@ Agregar tus scripts en `assets/js/` e incluirlos en `includes/footer.php`
 ⚠️ **IMPORTANTE antes de desplegar a producción**:
 
 1. **Variables de entorno**:
+
    ```env
    APP_ENV=production
    APP_DEBUG=false
@@ -264,16 +285,19 @@ Agregar tus scripts en `assets/js/` e incluirlos en `includes/footer.php`
    ```
 
 2. **Cambiar credenciales**:
+
    - Cambiar contraseñas por defecto de usuarios
    - Generar nuevo `APP_KEY` único
    - Usar contraseña fuerte para MySQL
 
 3. **HTTPS**:
+
    - Habilitar SSL/TLS
    - Activar `SESSION_SECURE=true`
    - Forzar HTTPS en Apache/Nginx
 
 4. **Permisos de archivos**:
+
    ```bash
    chmod 644 .env
    chmod 755 pages/
@@ -281,6 +305,7 @@ Agregar tus scripts en `assets/js/` e incluirlos en `includes/footer.php`
    ```
 
 5. **Ocultar información del servidor**:
+
    - Desactivar `display_errors` en php.ini
    - Ocultar versión de PHP
    - Configurar CSP headers
@@ -317,10 +342,73 @@ openssl rand -base64 32
 - [ ] Módulo de evaluaciones de desempeño
 - [ ] App móvil
 
+## Problemas Comunes y Soluciones
+
+### 1. Problemas con Rutas
+
+El sistema es sensible a mayúsculas/minúsculas y rutas exactas. Aquí algunos puntos importantes:
+
+#### Rutas del Sistema
+
+- La carpeta debe llamarse exactamente `Comfachoco` (con C mayúscula)
+- Todos los archivos y carpetas deben mantener exactamente el mismo nombre que en el repositorio
+- En Linux/Mac las rutas son case-sensitive (distinguen mayúsculas/minúsculas)
+
+#### URLs y Acceso
+
+```bash
+# ✅ Correcto
+http://localhost/Comfachoco
+http://localhost/Comfachoco/pages/login.php
+
+# ❌ Incorrecto
+http://localhost/comfachoco         # 'c' minúscula
+http://localhost/COMFACHOCO         # todo mayúsculas
+http://localhost/Comfachoco/Login   # 'Login' con mayúscula
+```
+
+#### Solución de Problemas de Rutas
+
+1. **Error 404**: Verificar que la ruta sea exactamente igual (mayúsculas/minúsculas)
+2. **Archivos no encontrados**:
+   - Usar `__DIR__` para rutas relativas
+   - Verificar permisos de carpetas
+3. **Assets no cargan**:
+   - Comprobar la variable `APP_URL` en configuración
+   - Verificar rutas en includes/head.php
+
+### 2. Permisos de Archivos
+
+En Linux/Mac, establecer los permisos correctos:
+
+```bash
+# Carpetas
+chmod 755 /opt/lampp/htdocs/Comfachoco
+chmod 755 /opt/lampp/htdocs/Comfachoco/uploads
+chmod 755 /opt/lampp/htdocs/Comfachoco/config
+
+# Archivos
+chmod 644 /opt/lampp/htdocs/Comfachoco/config/env.php
+chmod 644 /opt/lampp/htdocs/Comfachoco/uploads/*
+```
+
+### 3. Problemas de Base de Datos
+
+- Verificar que el nombre de la base de datos sea exactamente `comfachoco`
+- Las tablas y columnas son case-sensitive en algunos sistemas
+- Usar siempre minúsculas para nombres de tablas y columnas
+
 ## Soporte
 
-Para reportar problemas o sugerencias, contacta al equipo de desarrollo.
+Para reportar problemas o solicitar ayuda:
+
+1. Abrir un issue en GitHub
+2. Detallar el problema y pasos para reproducirlo
+3. Incluir logs relevantes
+4. Especificar versión de PHP y MySQL
+5. Incluir capturas de pantalla si es necesario
+6. Mencionar el sistema operativo y entorno
 
 ## Licencia
 
-© 2024 ComfaChoco International. Todos los derechos reservados.
+© 2024 ComfaChoco. Todos los derechos reservados.
