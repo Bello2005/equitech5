@@ -2147,6 +2147,20 @@ $page_title = 'Asistente Virtual - ComfaChoco';
             border-color: rgba(255, 255, 255, 0.2) !important;
         }
 
+        /* Texto del panel de accesibilidad en modo oscuro */
+        html.dark-mode .fixed .bg-white .text-gray-900,
+        html.dark-mode .fixed .bg-white .text-gray-700,
+        html.dark-mode .fixed .bg-white .text-gray-600,
+        html.dark-mode .fixed .bg-white .text-gray-500 {
+            color: #ffffff !important;
+        }
+
+        html.dark-mode .fixed .bg-white p,
+        html.dark-mode .fixed .bg-white span,
+        html.dark-mode .fixed .bg-white h3 {
+            color: #ffffff !important;
+        }
+
         /* Panel de accesibilidad en modo oscuro + alto contraste */
         html.dark-mode body.high-contrast .fixed .bg-white {
             background: #000000 !important;
