@@ -123,20 +123,21 @@ INSERT INTO usuarios (nombre, email, password, rol, avatar, activo)
 VALUES (
     'Bello González',
     'admin@comfachoco.com',
-    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+    '$2y$10$OcSn3FEnBv2.LnpDmIldOO4jLNB7Y2zz04i5k2Q45g4DxktZ9Uqjm',
     'admin',
     'https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100&q=80',
     1
 );
 
 -- Insertar usuarios de prueba
+-- Contraseña para todos: admin123
 INSERT INTO usuarios (nombre, email, password, rol, activo)
 VALUES
-('Carlos Ruiz', 'carlos.ruiz@comfachoco.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'empleado', 1),
-('Ana Mendoza', 'ana.mendoza@comfachoco.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'empleado', 1),
-('David Torres', 'david.torres@comfachoco.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'empleado', 1),
-('Laura Silva', 'laura.silva@comfachoco.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'gerente', 1),
-('Miguel Santos', 'miguel.santos@comfachoco.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'empleado', 1);
+('Carlos Ruiz', 'carlos.ruiz@comfachoco.com', '$2y$10$OcSn3FEnBv2.LnpDmIldOO4jLNB7Y2zz04i5k2Q45g4DxktZ9Uqjm', 'empleado', 1),
+('Ana Mendoza', 'ana.mendoza@comfachoco.com', '$2y$10$OcSn3FEnBv2.LnpDmIldOO4jLNB7Y2zz04i5k2Q45g4DxktZ9Uqjm', 'empleado', 1),
+('David Torres', 'david.torres@comfachoco.com', '$2y$10$OcSn3FEnBv2.LnpDmIldOO4jLNB7Y2zz04i5k2Q45g4DxktZ9Uqjm', 'empleado', 1),
+('Laura Silva', 'laura.silva@comfachoco.com', '$2y$10$OcSn3FEnBv2.LnpDmIldOO4jLNB7Y2zz04i5k2Q45g4DxktZ9Uqjm', 'gerente', 1),
+('Miguel Santos', 'miguel.santos@comfachoco.com', '$2y$10$OcSn3FEnBv2.LnpDmIldOO4jLNB7Y2zz04i5k2Q45g4DxktZ9Uqjm', 'empleado', 1);
 
 -- Insertar solicitudes de prueba
 INSERT INTO solicitudes (usuario_id, tipo, fecha_inicio, fecha_fin, dias, motivo, estado, prioridad)

@@ -8,6 +8,12 @@ requireLogin();
 // Obtener datos del usuario actual
 $usuario = getCurrentUser();
 
+// Redirigir empleados a su dashboard específico
+if ($usuario['rol'] === 'empleado') {
+    header('Location: empleado_dashboard.php');
+    exit;
+}
+
 // Si no hay avatar, usar uno por defecto
 if (empty($usuario['avatar'])) {
     $usuario['avatar'] = 'https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&h=100&q=80';

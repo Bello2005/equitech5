@@ -87,60 +87,60 @@ include __DIR__ . '/../includes/sidebar.php';
 include __DIR__ . '/../includes/header.php';
 ?>
 
-<main class="flex-1 overflow-y-auto focus:outline-none py-8" x-data="configPage()">
+<main class="flex-1 overflow-y-auto focus:outline-none py-6" x-data="configPage()">
     <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Configuración del Sistema</h1>
-            <p class="text-gray-600">Administra las preferencias y configuraciones de tu cuenta y del sistema.</p>
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-1">Configuración del Sistema</h1>
+            <p class="text-sm text-gray-600">Administra las preferencias y configuraciones de tu cuenta y del sistema.</p>
         </div>
 
         <!-- Mensajes de Feedback -->
         <?php if ($success): ?>
-        <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-2xl animate-fade-in" role="alert">
+        <div class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl animate-fade-in" role="alert">
             <div class="flex items-center">
-                <i class="fas fa-check-circle text-green-500 mr-3"></i>
-                <span class="font-medium"><?= htmlspecialchars($success) ?></span>
+                <i class="fas fa-check-circle text-green-500 mr-2 text-sm"></i>
+                <span class="text-sm font-medium"><?= htmlspecialchars($success) ?></span>
             </div>
         </div>
         <?php endif; ?>
 
         <?php if ($error): ?>
-        <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl animate-fade-in" role="alert">
+        <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl animate-fade-in" role="alert">
             <div class="flex items-center">
-                <i class="fas fa-exclamation-circle text-red-500 mr-3"></i>
-                <span class="font-medium"><?= htmlspecialchars($error) ?></span>
+                <i class="fas fa-exclamation-circle text-red-500 mr-2 text-sm"></i>
+                <span class="text-sm font-medium"><?= htmlspecialchars($error) ?></span>
             </div>
         </div>
         <?php endif; ?>
 
-        <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 xl:grid-cols-4 gap-4">
             <!-- Sidebar Navigation -->
             <div class="xl:col-span-1">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sticky top-24">
-                    <nav class="space-y-2">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sticky top-20">
+                    <nav class="space-y-1">
                         <button @click="activeTab = 'profile'"
-                                :class="activeTab === 'profile' ? 'bg-primary/10 text-primary' : 'text-gray-700 hover:bg-gray-50'"
-                                class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all">
-                            <i class="fas fa-user mr-3"></i>
+                                :class="activeTab === 'profile' ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-gray-700 hover:bg-gray-50 border-l-4 border-transparent'"
+                                class="w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all">
+                            <i class="fas fa-user mr-2.5 text-sm"></i>
                             Perfil
                         </button>
                         <button @click="activeTab = 'security'"
-                                :class="activeTab === 'security' ? 'bg-primary/10 text-primary' : 'text-gray-700 hover:bg-gray-50'"
-                                class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all">
-                            <i class="fas fa-lock mr-3"></i>
+                                :class="activeTab === 'security' ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-gray-700 hover:bg-gray-50 border-l-4 border-transparent'"
+                                class="w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all">
+                            <i class="fas fa-lock mr-2.5 text-sm"></i>
                             Seguridad
                         </button>
                         <button @click="activeTab = 'notifications'"
-                                :class="activeTab === 'notifications' ? 'bg-primary/10 text-primary' : 'text-gray-700 hover:bg-gray-50'"
-                                class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all">
-                            <i class="fas fa-bell mr-3"></i>
+                                :class="activeTab === 'notifications' ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-gray-700 hover:bg-gray-50 border-l-4 border-transparent'"
+                                class="w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all">
+                            <i class="fas fa-bell mr-2.5 text-sm"></i>
                             Notificaciones
                         </button>
                         <button @click="activeTab = 'preferences'"
-                                :class="activeTab === 'preferences' ? 'bg-primary/10 text-primary' : 'text-gray-700 hover:bg-gray-50'"
-                                class="w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all">
-                            <i class="fas fa-sliders-h mr-3"></i>
+                                :class="activeTab === 'preferences' ? 'bg-primary/10 text-primary border-l-4 border-primary' : 'text-gray-700 hover:bg-gray-50 border-l-4 border-transparent'"
+                                class="w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all">
+                            <i class="fas fa-sliders-h mr-2.5 text-sm"></i>
                             Preferencias
                         </button>
                     </nav>
@@ -148,7 +148,7 @@ include __DIR__ . '/../includes/header.php';
             </div>
 
             <!-- Main Content -->
-            <div class="xl:col-span-3 space-y-6">
+            <div class="xl:col-span-3 space-y-4">
                 <!-- Profile Information -->
                 <div x-show="activeTab === 'profile'" x-transition class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-primary/5 to-transparent">
@@ -743,20 +743,29 @@ include __DIR__ . '/../includes/header.php';
                 </div>
 
                 <!-- Danger Zone -->
-                <div x-show="activeTab === 'security'" x-transition class="bg-red-50 border border-red-200 rounded-2xl overflow-hidden">
-                    <div class="px-6 py-5 border-b border-red-200">
-                        <h3 class="text-xl font-semibold text-red-900">Zona de Peligro</h3>
-                        <p class="text-sm text-red-700 mt-1">Acciones irreversibles</p>
+                <div x-show="activeTab === 'security'" x-transition class="bg-gradient-to-br from-red-50 to-red-100 border border-red-300 rounded-xl overflow-hidden">
+                    <div class="px-5 py-4 border-b border-red-300 bg-red-100">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-exclamation-triangle text-red-600"></i>
+                            <h3 class="text-lg font-semibold text-red-900">Zona de Peligro</h3>
+                        </div>
+                        <p class="text-xs text-red-700 mt-1">Acciones irreversibles que afectan tu cuenta</p>
                     </div>
-                    <div class="p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="font-medium text-red-900 mb-1">Eliminar Cuenta</p>
-                                <p class="text-sm text-red-700">Una vez eliminada, no podrás recuperar tu cuenta ni tus datos.</p>
+                    <div class="p-5">
+                        <div class="flex items-start justify-between p-4 bg-white rounded-lg border-2 border-red-200">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-trash-alt text-white"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-red-900 mb-1">Eliminar Cuenta Permanentemente</p>
+                                    <p class="text-xs text-red-700">Una vez eliminada, no podrás recuperar tu cuenta, datos, solicitudes ni configuraciones.</p>
+                                </div>
                             </div>
                             <button @click="confirmDelete = true"
-                                    class="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors">
-                                Eliminar Cuenta
+                                    class="px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-md flex-shrink-0 ml-3">
+                                <i class="fas fa-trash mr-1.5 text-xs"></i>
+                                Eliminar
                             </button>
                         </div>
                     </div>
