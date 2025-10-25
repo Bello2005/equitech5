@@ -314,9 +314,11 @@ $page_title = 'Asistente Virtual - ComfaChoco';
                         <!-- Saludo -->
                         <div class="max-w-4xl mx-auto mb-4 sm:mb-6 md:mb-8">
                             <div class="flex items-start space-x-2 sm:space-x-3 md:space-x-4">
-                                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 p-2">
-                                        <img src="../assets/images/logo-comfachoco-no-lema.svg" alt="ComfaChoco" class="w-full h-full object-contain">
-                                    </div>
+                                <div class="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-primary rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                                    <span class="text-white text-lg sm:text-xl md:text-2xl font-bold">
+                                        <?= htmlspecialchars($usuario['iniciales']) ?>
+                                    </span>
+                                </div>
                                     <div>
                                     <h2 class="text-sm sm:text-base md:text-lg font-bold text-gray-900 mb-1">
                                             ¡Hola <?= htmlspecialchars($primer_nombre) ?>! 👋
