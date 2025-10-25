@@ -72,7 +72,7 @@ function logout() {
     // Destruir la sesión
     session_destroy();
 
-    $app_url = env('APP_URL', '/equitech5');
+    $app_url = env('APP_URL', '/Comfachoco');
     header("Location: {$app_url}/index.php");
     exit();
 }

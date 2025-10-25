@@ -588,5 +588,44 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
+    // Manejar parámetro 'tipo' en la URL para abrir automáticamente el modal
+    const urlParams = new URLSearchParams(window.location.search);
+    const tipoParam = urlParams.get('tipo');
+
+    if (tipoParam) {
+        // Abrir el modal de nueva solicitud
+        const modal = document.getElementById('modal-nueva-solicitud');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+
+        // Pre-seleccionar el tipo de permiso
+        const selectTipo = document.getElementById('tipo-permiso');
+        if (selectTipo) {
+            // Mapear los tipos del asistente a los valores del select
+            const tipoMap = {
+                'vacaciones': 'vacaciones',
+                'maternidad_paternidad': 'maternidad',
+                'maternidad': 'maternidad',
+                'paternidad': 'paternidad',
+                'medico': 'permiso_medico',
+                'permiso_medico': 'permiso_medico',
+                'jurado': 'jurado',
+                'duelo': 'duelo',
+                'teletrabajo': 'otro',
+                'cita_medica_hijo': 'cita_medica_hijo'
+            };
+
+            const valorSeleccionar = tipoMap[tipoParam.toLowerCase()] || tipoParam;
+            selectTipo.value = valorSeleccionar;
+
+            // Disparar evento change para actualizar la UI si es necesario
+            selectTipo.dispatchEvent(new Event('change'));
+        }
+
+        // Limpiar la URL para evitar que se reabra el modal al recargar
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
 });
 </script>

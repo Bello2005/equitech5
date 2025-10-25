@@ -5,24 +5,71 @@ require_once __DIR__ . '/../config/session.php';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $cedula = $_POST['cedula'] ?? '';
-    $primer_nombre = $_POST['primer-nombre'] ?? '';
-    $primer_apellido = $_POST['primer-apellido'] ?? '';
+    require_once __DIR__ . '/../config/database.php';
 
-    // Crear sesión automáticamente sin validar credenciales
+    $cedula = trim($_POST['cedula'] ?? '');
+    $primer_nombre = trim($_POST['primer-nombre'] ?? '');
+    $primer_apellido = trim($_POST['primer-apellido'] ?? '');
+
     if (!empty($cedula) && !empty($primer_nombre) && !empty($primer_apellido)) {
-        // Crear sesión con los datos proporcionados
-        $_SESSION['user_id'] = 1;
-        $_SESSION['user_name'] = "$primer_nombre $primer_apellido";
-        $_SESSION['user_email'] = strtolower($primer_nombre) . '.' . strtolower($primer_apellido) . '@comfachoco.com';
-        $_SESSION['user_role'] = 'empleado';
-        $_SESSION['user_avatar'] = '';
-        $_SESSION['user_empresa'] = 'ComfaChoco International';
-        $_SESSION['cedula'] = $cedula;
-        
-        // Redirigir al dashboard de empleado
-        header('Location: empleado_dashboard.php');
-        exit();
+        try {
+            // Buscar usuario por cédula, primer nombre y primer apellido
+            $stmt = $conn->prepare("
+                SELECT u.id, u.nombre, u.email, u.rol, u.departamento,
+                       u.avatar, u.activo, u.tipo_empleado_id, u.fecha_ingreso,
+                       u.cedula, u.primer_nombre, u.primer_apellido,
+                       te.nombre as tipo_empleado_nombre
+                FROM usuarios u
+                LEFT JOIN tipos_empleado te ON te.id = u.tipo_empleado_id
+                WHERE u.cedula = ?
+                  AND LOWER(u.primer_nombre) = LOWER(?)
+                  AND LOWER(u.primer_apellido) = LOWER(?)
+                  AND u.activo = 1
+            ");
+            $stmt->bind_param('sss', $cedula, $primer_nombre, $primer_apellido);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows === 1) {
+                $usuario = $result->fetch_assoc();
+
+                // Si es admin, redirigir al login de administrador
+                if ($usuario['rol'] === 'admin') {
+                    header('Location: admin-login.php');
+                    exit;
+                }
+
+                // Credenciales válidas - Crear sesión
+                $_SESSION['user_id'] = $usuario['id'];
+                $_SESSION['user_name'] = $usuario['nombre'];
+                $_SESSION['user_email'] = $usuario['email'];
+                $_SESSION['user_role'] = $usuario['rol'];
+                $_SESSION['user_avatar'] = $usuario['avatar'] ?? '';
+                $_SESSION['user_empresa'] = 'ComfaChoco International';
+                $_SESSION['departamento'] = $usuario['departamento'];
+                $_SESSION['tipo_empleado_id'] = $usuario['tipo_empleado_id'];
+                $_SESSION['tipo_empleado_nombre'] = $usuario['tipo_empleado_nombre'];
+                $_SESSION['fecha_ingreso'] = $usuario['fecha_ingreso'];
+                $_SESSION['cedula'] = $usuario['cedula'];
+                $_SESSION['primer_nombre'] = $usuario['primer_nombre'];
+                $_SESSION['primer_apellido'] = $usuario['primer_apellido'];
+
+                // Redirigir según el rol
+                if ($usuario['rol'] === 'admin' || $usuario['rol'] === 'gerente') {
+                    header('Location: dashboard.php');
+                } else {
+                    header('Location: empleado_dashboard.php');
+                }
+                exit();
+            } else {
+                $error = 'Credenciales incorrectas. Verifica tu cédula, nombre y apellido.';
+            }
+
+            $stmt->close();
+        } catch (Exception $e) {
+            error_log("Error en login: " . $e->getMessage());
+            $error = 'Error al procesar el inicio de sesión. Por favor intenta nuevamente.';
+        }
     } else {
         $error = 'Por favor completa todos los campos.';
     }
