@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/session.php';
+require_once __DIR__ . '/../config/database.php';
 
 requireLogin();
 $usuario = getCurrentUser();
@@ -13,15 +14,40 @@ $usuario['iniciales'] = substr($nombre_partes[0], 0, 1) . (isset($nombre_partes[
 
 $page_title = 'Equipo';
 
-// Datos de equipo de prueba
-$miembros_equipo = [
-    ['nombre' => 'Carlos Ruiz', 'puesto' => 'Desarrollador Senior', 'departamento' => 'Desarrollo', 'email' => 'carlos.ruiz@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=12', 'estado' => 'activo'],
-    ['nombre' => 'Ana Mendoza', 'puesto' => 'Diseñadora UX/UI', 'departamento' => 'Diseño', 'email' => 'ana.mendoza@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=5', 'estado' => 'activo'],
-    ['nombre' => 'David Torres', 'puesto' => 'Gerente de Proyecto', 'departamento' => 'Gestión', 'email' => 'david.torres@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=33', 'estado' => 'vacaciones'],
-    ['nombre' => 'Laura Silva', 'puesto' => 'Analista de Datos', 'departamento' => 'Analytics', 'email' => 'laura.silva@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=9', 'estado' => 'activo'],
-    ['nombre' => 'Miguel Santos', 'puesto' => 'DevOps Engineer', 'departamento' => 'Infraestructura', 'email' => 'miguel.santos@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=15', 'estado' => 'activo'],
-    ['nombre' => 'Sofia Ramirez', 'puesto' => 'HR Manager', 'departamento' => 'Recursos Humanos', 'email' => 'sofia.ramirez@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=20', 'estado' => 'activo'],
-];
+// Intentar cargar empleados desde la base de datos
+try {
+    $conn = getConnection();
+    $sql = "SELECT id, nombre, email, rol, activo, fecha_creacion FROM usuarios WHERE rol IN ('empleado', 'gerente') ORDER BY nombre ASC";
+    $result = $conn->query($sql);
+
+    $miembros_equipo = [];
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $miembros_equipo[] = [
+                'id' => $row['id'],
+                'nombre' => $row['nombre'],
+                'email' => $row['email'],
+                'puesto' => ucfirst($row['rol']),
+                'departamento' => 'General',
+                'avatar' => 'https://i.pravatar.cc/150?u=' . urlencode($row['email']),
+                'estado' => $row['activo'] ? 'activo' : 'inactivo'
+            ];
+        }
+    }
+    $conn->close();
+} catch (Exception $e) {
+    error_log("Error cargando empleados: " . $e->getMessage());
+
+    // Datos de equipo de prueba como fallback
+    $miembros_equipo = [
+        ['nombre' => 'Carlos Ruiz', 'puesto' => 'Desarrollador Senior', 'departamento' => 'Desarrollo', 'email' => 'carlos.ruiz@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=12', 'estado' => 'activo'],
+        ['nombre' => 'Ana Mendoza', 'puesto' => 'Diseñadora UX/UI', 'departamento' => 'Diseño', 'email' => 'ana.mendoza@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=5', 'estado' => 'activo'],
+        ['nombre' => 'David Torres', 'puesto' => 'Gerente de Proyecto', 'departamento' => 'Gestión', 'email' => 'david.torres@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=33', 'estado' => 'vacaciones'],
+        ['nombre' => 'Laura Silva', 'puesto' => 'Analista de Datos', 'departamento' => 'Analytics', 'email' => 'laura.silva@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=9', 'estado' => 'activo'],
+        ['nombre' => 'Miguel Santos', 'puesto' => 'DevOps Engineer', 'departamento' => 'Infraestructura', 'email' => 'miguel.santos@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=15', 'estado' => 'activo'],
+        ['nombre' => 'Sofia Ramirez', 'puesto' => 'HR Manager', 'departamento' => 'Recursos Humanos', 'email' => 'sofia.ramirez@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=20', 'estado' => 'activo'],
+    ];
+}
 
 include __DIR__ . '/../includes/head.php';
 include __DIR__ . '/../includes/sidebar.php';

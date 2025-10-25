@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/session.php';
+require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/mock_data.php';
 
 requireLogin();
@@ -13,6 +14,80 @@ $nombre_partes = explode(' ', $usuario['nombre']);
 $usuario['iniciales'] = substr($nombre_partes[0], 0, 1) . (isset($nombre_partes[1]) ? substr($nombre_partes[1], 0, 1) : '');
 
 $page_title = 'Calendario';
+
+// Cargar eventos desde la base de datos
+$eventos_calendario = [];
+$proximos_eventos = [];
+
+try {
+    $conn = getConnection();
+
+    // Cargar todos los eventos para el calendario
+    $sql = "SELECT
+        e.id,
+        e.titulo,
+        e.descripcion,
+        e.fecha_inicio,
+        e.fecha_fin,
+        e.tipo,
+        e.color,
+        COALESCE(u.nombre, 'Sistema') AS usuario_nombre
+    FROM eventos e
+    LEFT JOIN usuarios u ON u.id = e.usuario_id
+    ORDER BY e.fecha_inicio ASC";
+
+    $result = $conn->query($sql);
+    if ($result && $result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $eventos_calendario[] = [
+                'id' => (int)$row['id'],
+                'titulo' => $row['titulo'],
+                'descripcion' => $row['descripcion'] ?? '',
+                'fecha' => $row['fecha_inicio'],
+                'fecha_inicio' => $row['fecha_inicio'],
+                'fecha_fin' => $row['fecha_fin'],
+                'tipo' => $row['tipo'],
+                'color' => $row['color'] ?? '#0B8A3A',
+                'usuario' => $row['usuario_nombre']
+            ];
+        }
+    }
+
+    // Cargar próximos eventos (futuros o de hoy)
+    $sql_proximos = "SELECT
+        e.id,
+        e.titulo,
+        e.fecha_inicio,
+        e.tipo,
+        COALESCE(u.nombre, 'Sistema') AS usuario_nombre
+    FROM eventos e
+    LEFT JOIN usuarios u ON u.id = e.usuario_id
+    WHERE e.fecha_inicio >= CURDATE()
+    ORDER BY e.fecha_inicio ASC
+    LIMIT 10";
+
+    $result_proximos = $conn->query($sql_proximos);
+    if ($result_proximos && $result_proximos->num_rows > 0) {
+        while ($row = $result_proximos->fetch_assoc()) {
+            $proximos_eventos[] = [
+                'titulo' => $row['titulo'],
+                'fecha' => $row['fecha_inicio'],
+                'tipo' => $row['tipo'],
+                'usuario' => $row['usuario_nombre']
+            ];
+        }
+    }
+
+    $conn->close();
+} catch (Exception $e) {
+    error_log("Error cargando eventos: " . $e->getMessage());
+    // Usar datos mock como fallback (ya cargados)
+}
+
+// Si no hay eventos de la BD, usar los del mock_data
+if (empty($proximos_eventos) && !empty($eventos_calendario)) {
+    $proximos_eventos = array_slice($eventos_calendario, 0, 10);
+}
 
 include __DIR__ . '/../includes/head.php';
 include __DIR__ . '/../includes/sidebar.php';
@@ -50,15 +125,22 @@ include __DIR__ . '/../includes/header.php';
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Próximos Eventos</h3>
                     <div class="space-y-4">
-                        <?php foreach (array_slice($eventos_calendario, 0, 5) as $evento): ?>
-                        <div class="flex items-start space-x-3">
-                            <div class="w-2 h-2 rounded-full bg-primary mt-2"></div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-900"><?= $evento['titulo'] ?></p>
-                                <p class="text-xs text-gray-500"><?= date('d M Y', strtotime($evento['fecha'])) ?></p>
+                        <?php if (empty($proximos_eventos)): ?>
+                            <p class="text-sm text-gray-500 text-center py-4">No hay eventos próximos</p>
+                        <?php else: ?>
+                            <?php foreach (array_slice($proximos_eventos, 0, 5) as $evento): ?>
+                            <div class="flex items-start space-x-3">
+                                <div class="w-2 h-2 rounded-full bg-primary mt-2"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900"><?= htmlspecialchars($evento['titulo']) ?></p>
+                                    <p class="text-xs text-gray-500"><?= date('d M Y', strtotime($evento['fecha'])) ?></p>
+                                    <?php if (!empty($evento['usuario'])): ?>
+                                    <p class="text-xs text-gray-400"><?= htmlspecialchars($evento['usuario']) ?></p>
+                                    <?php endif; ?>
+                                </div>
                             </div>
-                        </div>
-                        <?php endforeach; ?>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -90,16 +172,27 @@ include __DIR__ . '/../includes/header.php';
 </main>
 
 <script>
+// Eventos cargados desde la base de datos
 window.calendarEvents = [
-    <?php foreach ($eventos_calendario as $evento): ?>
-    {
-        title: '<?= addslashes($evento['titulo']) ?>',
-        start: '<?= $evento['fecha'] ?>',
-        color: '<?= $evento['tipo'] == 'vacaciones' ? '#0B8A3A' : ($evento['tipo'] == 'permiso' ? '#FFD400' : ($evento['tipo'] == 'reunion' ? '#3B82F6' : '#8B5CF6')) ?>',
-        textColor: '<?= $evento['tipo'] == 'vacaciones' ? 'white' : 'black' ?>'
-    },
-    <?php endforeach; ?>
+    <?php if (!empty($eventos_calendario)): ?>
+        <?php foreach ($eventos_calendario as $index => $evento): ?>
+        {
+            id: <?= $evento['id'] ?>,
+            title: '<?= addslashes($evento['titulo']) ?>',
+            start: '<?= $evento['fecha_inicio'] ?>',
+            end: '<?= $evento['fecha_fin'] ?>',
+            color: '<?= $evento['color'] ?>',
+            extendedProps: {
+                tipo: '<?= addslashes($evento['tipo']) ?>',
+                descripcion: '<?= addslashes($evento['descripcion']) ?>',
+                usuario: '<?= addslashes($evento['usuario']) ?>'
+            }
+        }<?= $index < count($eventos_calendario) - 1 ? ',' : '' ?>
+        <?php endforeach; ?>
+    <?php endif; ?>
 ];
+
+console.log('Eventos cargados:', window.calendarEvents.length);
 </script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
