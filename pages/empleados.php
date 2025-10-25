@@ -14,39 +14,92 @@ $usuario['iniciales'] = substr($nombre_partes[0], 0, 1) . (isset($nombre_partes[
 
 $page_title = 'Equipo';
 
-// Intentar cargar empleados desde la base de datos
+// Cargar empleados con información completa
+$miembros_equipo = [];
+$stats = ['total' => 0, 'activos' => 0, 'vacaciones' => 0, 'nuevos_mes' => 0];
+
 try {
     $conn = getConnection();
-    $sql = "SELECT id, nombre, email, rol, activo, fecha_creacion FROM usuarios WHERE rol IN ('empleado', 'gerente') ORDER BY nombre ASC";
+
+    // Query mejorada con tipo de empleado, departamento y días disponibles
+    $sql = "SELECT
+                u.id,
+                u.nombre,
+                u.email,
+                u.rol,
+                u.departamento,
+                u.activo,
+                u.fecha_creacion,
+                u.fecha_ingreso,
+                u.dias_vacaciones_acumulados,
+                u.periodos_acumulados,
+                te.nombre as tipo_empleado,
+                pv.dias_por_periodo
+            FROM usuarios u
+            LEFT JOIN tipos_empleado te ON te.id = u.tipo_empleado_id
+            LEFT JOIN politicas_vacaciones pv ON pv.tipo_empleado_id = u.tipo_empleado_id
+            WHERE u.rol IN ('empleado', 'gerente', 'admin')
+            ORDER BY u.nombre ASC";
+
     $result = $conn->query($sql);
 
-    $miembros_equipo = [];
     if ($result) {
         while ($row = $result->fetch_assoc()) {
+            // Calcular días disponibles
+            $dias_ganados = 0;
+            $dias_usados = $row['dias_vacaciones_acumulados'] ?? 0;
+
+            if ($row['fecha_ingreso']) {
+                $dias_trabajados = (strtotime('now') - strtotime($row['fecha_ingreso'])) / 86400;
+                $periodos_completos = floor($dias_trabajados / 360);
+                $periodos_disponibles = min($periodos_completos, 2); // Máximo 2 períodos
+                $dias_por_periodo = $row['dias_por_periodo'] ?? 15;
+                $dias_ganados = $periodos_disponibles * $dias_por_periodo;
+            }
+
+            $dias_disponibles = $dias_ganados - $dias_usados;
+
+            // Verificar si está en vacaciones actualmente
+            $sql_vacaciones = "SELECT COUNT(*) as en_vacaciones FROM solicitudes
+                             WHERE usuario_id = ?
+                             AND tipo = 'vacaciones'
+                             AND estado = 'aprobado'
+                             AND fecha_inicio <= CURDATE()
+                             AND fecha_fin >= CURDATE()";
+            $stmt = $conn->prepare($sql_vacaciones);
+            $stmt->bind_param('i', $row['id']);
+            $stmt->execute();
+            $vac_result = $stmt->get_result()->fetch_assoc();
+            $en_vacaciones = $vac_result['en_vacaciones'] > 0;
+            $stmt->close();
+
             $miembros_equipo[] = [
                 'id' => $row['id'],
                 'nombre' => $row['nombre'],
                 'email' => $row['email'],
                 'puesto' => ucfirst($row['rol']),
-                'departamento' => 'General',
+                'tipo_empleado' => $row['tipo_empleado'] ?? 'No asignado',
+                'departamento' => $row['departamento'] ?? 'General',
+                'dias_disponibles' => $dias_disponibles,
+                'dias_ganados' => $dias_ganados,
+                'dias_usados' => $dias_usados,
+                'fecha_ingreso' => $row['fecha_ingreso'],
                 'avatar' => 'https://i.pravatar.cc/150?u=' . urlencode($row['email']),
-                'estado' => $row['activo'] ? 'activo' : 'inactivo'
+                'estado' => $en_vacaciones ? 'vacaciones' : ($row['activo'] ? 'activo' : 'inactivo')
             ];
+
+            // Calcular stats
+            $stats['total']++;
+            if ($row['activo']) $stats['activos']++;
+            if ($en_vacaciones) $stats['vacaciones']++;
+            if ($row['fecha_creacion'] && date('Y-m', strtotime($row['fecha_creacion'])) == date('Y-m')) {
+                $stats['nuevos_mes']++;
+            }
         }
     }
     $conn->close();
 } catch (Exception $e) {
     error_log("Error cargando empleados: " . $e->getMessage());
-
-    // Datos de equipo de prueba como fallback
-    $miembros_equipo = [
-        ['nombre' => 'Carlos Ruiz', 'puesto' => 'Desarrollador Senior', 'departamento' => 'Desarrollo', 'email' => 'carlos.ruiz@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=12', 'estado' => 'activo'],
-        ['nombre' => 'Ana Mendoza', 'puesto' => 'Diseñadora UX/UI', 'departamento' => 'Diseño', 'email' => 'ana.mendoza@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=5', 'estado' => 'activo'],
-        ['nombre' => 'David Torres', 'puesto' => 'Gerente de Proyecto', 'departamento' => 'Gestión', 'email' => 'david.torres@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=33', 'estado' => 'vacaciones'],
-        ['nombre' => 'Laura Silva', 'puesto' => 'Analista de Datos', 'departamento' => 'Analytics', 'email' => 'laura.silva@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=9', 'estado' => 'activo'],
-        ['nombre' => 'Miguel Santos', 'puesto' => 'DevOps Engineer', 'departamento' => 'Infraestructura', 'email' => 'miguel.santos@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=15', 'estado' => 'activo'],
-        ['nombre' => 'Sofia Ramirez', 'puesto' => 'HR Manager', 'departamento' => 'Recursos Humanos', 'email' => 'sofia.ramirez@comfachoco.com', 'avatar' => 'https://i.pravatar.cc/150?img=20', 'estado' => 'activo'],
-    ];
 }
 
 include __DIR__ . '/../includes/head.php';
@@ -80,7 +133,7 @@ include __DIR__ . '/../includes/header.php';
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">Activos</p>
-                        <p class="text-3xl font-bold text-green-600">5</p>
+                        <p class="text-3xl font-bold text-green-600"><?= $stats['activos'] ?></p>
                     </div>
                     <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
                         <i class="fas fa-user-check text-green-600 text-xl"></i>
@@ -92,7 +145,7 @@ include __DIR__ . '/../includes/header.php';
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm text-gray-600 mb-1">En Vacaciones</p>
-                        <p class="text-3xl font-bold text-yellow-600">1</p>
+                        <p class="text-3xl font-bold text-yellow-600"><?= $stats['vacaciones'] ?></p>
                     </div>
                     <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
                         <i class="fas fa-plane text-yellow-600 text-xl"></i>
@@ -117,10 +170,10 @@ include __DIR__ . '/../includes/header.php';
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
             <div class="px-6 py-5 border-b border-gray-100">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-xl font-semibold text-gray-900">Miembros del Equipo</h3>
-                    <button id="btn-agregar-miembro" type="button" class="px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors">
+                    <h3 class="text-xl font-semibold text-gray-900">Empleados</h3>
+                    <button id="btn-agregar-empleado" type="button" class="px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors">
                         <i class="fas fa-user-plus mr-2"></i>
-                        Agregar Miembro
+                        Agregar Empleado
                     </button>
                 </div>
             </div>
@@ -137,7 +190,22 @@ include __DIR__ . '/../includes/header.php';
                         </div>
                         <h4 class="text-lg font-bold text-gray-900 mb-1"><?= $miembro['nombre'] ?></h4>
                         <p class="text-sm text-gray-600 mb-1"><?= $miembro['puesto'] ?></p>
-                        <p class="text-xs text-gray-500 mb-4"><?= $miembro['departamento'] ?></p>
+                        <p class="text-xs text-gray-500 mb-2"><?= $miembro['departamento'] ?></p>
+                        <p class="text-xs text-gray-500 mb-3">
+                            <i class="fas fa-id-card mr-1"></i><?= $miembro['tipo_empleado'] ?>
+                        </p>
+
+                        <!-- Días de vacaciones disponibles -->
+                        <div class="bg-green-50 rounded-lg p-3 mb-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-green-700 font-medium">Días disponibles</span>
+                                <span class="text-lg font-bold text-green-800"><?= number_format($miembro['dias_disponibles'], 1) ?></span>
+                            </div>
+                            <div class="text-xs text-green-600 mt-1">
+                                <?= number_format($miembro['dias_ganados'], 1) ?> ganados - <?= number_format($miembro['dias_usados'], 1) ?> usados
+                            </div>
+                        </div>
+
                         <div class="flex items-center justify-between pt-4 border-t border-gray-200">
                             <a href="mailto:<?= $miembro['email'] ?>" class="text-primary hover:text-primary-dark text-sm">
                                 <i class="fas fa-envelope mr-1"></i>
@@ -157,45 +225,187 @@ include __DIR__ . '/../includes/header.php';
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
 
-<script>
-// Handler para agregar miembro
-document.addEventListener('DOMContentLoaded', function() {
-    const btnAgregar = document.getElementById('btn-agregar-miembro');
-    if (btnAgregar) {
-        btnAgregar.addEventListener('click', async function() {
-            const nombre = prompt('Nombre completo:');
-            if (!nombre) return alert('Nombre requerido');
-            const puesto = prompt('Puesto:');
-            if (!puesto) return alert('Puesto requerido');
-            const departamento = prompt('Departamento:');
-            if (!departamento) return alert('Departamento requerido');
-            const email = prompt('Email:');
-            if (!email) return alert('Email requerido');
-            const avatar = prompt('URL de avatar (opcional):') || '';
-            const estado = prompt('Estado (activo/vacaciones):', 'activo');
-            if (!estado) return alert('Estado requerido');
+<!-- Modal para agregar empleado -->
+<div id="modal-agregar-empleado" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-10 mx-auto p-6 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-2xl bg-white mb-10">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Agregar Nuevo Empleado</h3>
+                <button id="close-modal-empleado" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
 
-            const form = new FormData();
-            form.append('nombre', nombre);
-            form.append('puesto', puesto);
-            form.append('departamento', departamento);
-            form.append('email', email);
-            form.append('avatar', avatar);
-            form.append('estado', estado);
+            <form id="form-nuevo-empleado" class="space-y-5">
+                <!-- Nombre -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Nombre Completo <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="empleado-nombre" name="nombre" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                           placeholder="Ej: Juan Pérez García">
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Email <span class="text-red-500">*</span>
+                    </label>
+                    <input type="email" id="empleado-email" name="email" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                           placeholder="ejemplo@comfachoco.com">
+                </div>
+
+                <!-- Rol y Tipo de Empleado -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Rol <span class="text-red-500">*</span>
+                        </label>
+                        <select id="empleado-rol" name="rol" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition">
+                            <option value="">Seleccionar rol</option>
+                            <option value="empleado">Empleado</option>
+                            <option value="gerente">Gerente</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Tipo de Empleado <span class="text-red-500">*</span>
+                        </label>
+                        <select id="empleado-tipo" name="tipo_empleado_id" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition">
+                            <option value="">Seleccionar tipo</option>
+                            <?php
+                            try {
+                                $conn = getConnection();
+                                $result = $conn->query("SELECT id, nombre FROM tipos_empleado WHERE activo = 1 ORDER BY nombre");
+                                while ($row = $result->fetch_assoc()) {
+                                    echo '<option value="' . $row['id'] . '">' . htmlspecialchars($row['nombre']) . '</option>';
+                                }
+                                $conn->close();
+                            } catch (Exception $e) {
+                                error_log("Error cargando tipos: " . $e->getMessage());
+                            }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Departamento y Fecha de Ingreso -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Departamento <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="empleado-departamento" name="departamento" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                               placeholder="Ej: Recursos Humanos">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Fecha de Ingreso <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" id="empleado-fecha-ingreso" name="fecha_ingreso" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition">
+                    </div>
+                </div>
+
+                <!-- Contraseña -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Contraseña <span class="text-red-500">*</span>
+                    </label>
+                    <input type="password" id="empleado-password" name="password" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                           placeholder="Mínimo 6 caracteres">
+                    <p class="text-xs text-gray-500 mt-1">El empleado podrá cambiar su contraseña después</p>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex justify-end space-x-3 pt-4 border-t">
+                    <button type="button" id="btn-cancelar-empleado" class="px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="btn-submit-empleado" class="px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition shadow-sm">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Crear Empleado
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Handler para agregar empleado
+document.addEventListener('DOMContentLoaded', function() {
+    const btnAgregar = document.getElementById('btn-agregar-empleado');
+    const modal = document.getElementById('modal-agregar-empleado');
+    const closeModal = document.getElementById('close-modal-empleado');
+    const btnCancelar = document.getElementById('btn-cancelar-empleado');
+    const form = document.getElementById('form-nuevo-empleado');
+
+    // Abrir modal
+    if (btnAgregar) {
+        btnAgregar.addEventListener('click', function() {
+            modal.classList.remove('hidden');
+        });
+    }
+
+    // Cerrar modal
+    const cerrarModal = () => {
+        modal.classList.add('hidden');
+        form.reset();
+    };
+
+    if (closeModal) closeModal.addEventListener('click', cerrarModal);
+    if (btnCancelar) btnCancelar.addEventListener('click', cerrarModal);
+
+    // Cerrar al hacer clic fuera
+    modal?.addEventListener('click', function(e) {
+        if (e.target === modal) cerrarModal();
+    });
+
+    // Submit del formulario
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(form);
 
             try {
-                const res = await fetch('api/equipo_create.php', { method: 'POST', body: form });
-                if (!res.ok) throw new Error('Error creando miembro');
+                const btnSubmit = document.getElementById('btn-submit-empleado');
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Creando...';
+
+                const res = await fetch('api/empleado_create.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!res.ok) throw new Error('Error creando empleado');
+
                 const data = await res.json();
+
                 if (data && data.success) {
-                    alert('Miembro agregado');
+                    alert('Empleado creado exitosamente');
+                    cerrarModal();
                     location.reload();
                 } else {
-                    alert(data.message || 'Error al agregar miembro');
+                    alert(data.message || 'Error al crear empleado');
                 }
             } catch (err) {
                 console.error(err);
-                alert('Error de red al agregar miembro');
+                alert('Error de red al crear empleado');
+            } finally {
+                const btnSubmit = document.getElementById('btn-submit-empleado');
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = '<i class="fas fa-user-plus mr-2"></i> Crear Empleado';
             }
         });
     }

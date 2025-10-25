@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config/session.php';
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/validaciones_permisos.php';
 
 header('Content-Type: application/json; charset=utf-8');
 requireLogin();
@@ -15,71 +16,221 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $tipo = $_POST['tipo'] ?? '';
 $fecha_inicio = $_POST['fecha_inicio'] ?? null;
 $fecha_fin = $_POST['fecha_fin'] ?? $fecha_inicio;
-$dias = isset($_POST['dias']) ? (int)$_POST['dias'] : 1;
 $motivo = $_POST['motivo'] ?? '';
 
-if (empty($tipo) || empty($fecha_inicio)) {
+if (empty($tipo) || empty($fecha_inicio) || empty($motivo)) {
     http_response_code(400);
-    echo json_encode(['error' => 'Tipo y fecha de inicio son requeridos']);
+    echo json_encode(['error' => 'Tipo, fecha de inicio y motivo son requeridos']);
     exit;
 }
 
 try {
     $conn = getConnection();
 
-    // Check if column tipo_permiso_id exists
-    $dbName = DB_NAME;
-    $res = $conn->query("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '" . $conn->real_escape_string($dbName) . "' AND TABLE_NAME = 'solicitudes' AND COLUMN_NAME = 'tipo_permiso_id'");
-    $row = $res->fetch_assoc();
-    $hasTipoId = $row['cnt'] > 0;
+    // Obtener departamento del usuario
+    $sql_user = "SELECT departamento FROM usuarios WHERE id = ?";
+    $stmt = $conn->prepare($sql_user);
+    $stmt->bind_param('i', $user['id']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user_data = $result->fetch_assoc();
+    $departamento = $user_data['departamento'] ?? 'General';
+    $stmt->close();
 
-    if ($hasTipoId) {
-        // find or create tipos_permisos
-        $stmt = $conn->prepare("SELECT id FROM tipos_permisos WHERE nombre = ? LIMIT 1");
-        $stmt->bind_param('s', $tipo);
-        $stmt->execute();
-        $r = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
+    // Validar solicitud completa
+    $datos_validacion = [
+        'usuario_id' => $user['id'],
+        'tipo_permiso' => $tipo,
+        'fecha_inicio' => $fecha_inicio,
+        'fecha_fin' => $fecha_fin,
+        'motivo' => $motivo,
+        'departamento' => $departamento,
+        'tiene_documento' => isset($_FILES['documento']) && $_FILES['documento']['error'] === UPLOAD_ERR_OK
+    ];
 
-        if ($r) {
-            $tipo_id = (int)$r['id'];
-        } else {
-            $stmt = $conn->prepare("INSERT INTO tipos_permisos (nombre, descripcion, activo, fecha_creacion) VALUES (?, '', 1, NOW())");
-            $stmt->bind_param('s', $tipo);
-            $stmt->execute();
-            $tipo_id = $stmt->insert_id;
-            $stmt->close();
+    $validacion = validarSolicitudCompleta($datos_validacion);
+
+    // Si hay errores, retornar
+    if (!empty($validacion['errores'])) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error de validación',
+            'errores' => $validacion['errores']
+        ]);
+        $conn->close();
+        exit;
+    }
+
+    // Procesar documento si existe
+    $documento_path = null;
+    $tipo_documento = $validacion['tipo_documento'] ?? null;
+
+    if (!empty($_FILES['documento']) && $_FILES['documento']['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = dirname(dirname(__DIR__)) . '/uploads/documentos/';
+     
+        // Verificar y crear el directorio de uploads si no existe
+        if (!is_dir($upload_dir)) {
+            try {
+                if (!mkdir($upload_dir, 0777, true)) {
+                    error_log("Error al crear directorio: " . $upload_dir);
+                    error_log("Permisos actuales: " . substr(sprintf('%o', fileperms(dirname($upload_dir))), -4));
+                    http_response_code(500);
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Error al crear directorio de uploads',
+                        'debug' => [
+                            'dir' => $upload_dir,
+                            'exists' => file_exists($upload_dir),
+                            'parent_writable' => is_writable(dirname($upload_dir)),
+                            'error' => error_get_last()
+                        ]
+                    ]);
+                    $conn->close();
+                    exit;
+                }
+                chmod($upload_dir, 0777);
+            } catch (Exception $e) {
+                error_log("Excepción al crear directorio: " . $e->getMessage());
+                http_response_code(500);
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Error al crear directorio de uploads: ' . $e->getMessage()
+                ]);
+                $conn->close();
+                exit;
+            }
+        }
+        
+        // Verificar permisos de escritura
+        if (!is_writable($upload_dir)) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error de permisos en directorio de uploads'
+            ]);
+            $conn->close();
+            exit;
         }
 
-        $stmt = $conn->prepare("INSERT INTO solicitudes (usuario_id, tipo_permiso_id, fecha_inicio, fecha_fin, dias, motivo, estado, prioridad, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, 'pendiente', 'media', NOW())");
-        $stmt->bind_param('iissis', $user['id'], $tipo_id, $fecha_inicio, $fecha_fin, $dias, $motivo);
-        $stmt->execute();
-        $insertId = $stmt->insert_id;
-        $stmt->close();
+        $file_extension = pathinfo($_FILES['documento']['name'], PATHINFO_EXTENSION);
+        $allowed_extensions = ['pdf', 'jpg', 'jpeg', 'png'];
 
-    } else {
-        // insert using tipo text column
-    $stmt = $conn->prepare("INSERT INTO solicitudes (usuario_id, tipo, fecha_inicio, fecha_fin, dias, motivo, estado, prioridad, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, 'pendiente', 'media', NOW())");
-    $stmt->bind_param('isssis', $user['id'], $tipo, $fecha_inicio, $fecha_fin, $dias, $motivo);
+        if (!in_array(strtolower($file_extension), $allowed_extensions)) {
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Tipo de archivo no permitido. Solo PDF, JPG, JPEG, PNG'
+            ]);
+            $conn->close();
+            exit;
+        }
+
+        $filename = uniqid('doc_') . '_' . $user['id'] . '.' . $file_extension;
+       
+        if (!move_uploaded_file($_FILES['documento']['tmp_name'], $upload_dir . $filename)) {
+            $error = error_get_last();
+            error_log("Error al mover archivo: " . print_r($error, true));
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error al subir el documento',
+                'debug' => [
+                    'upload_dir' => $upload_dir,
+                    'filename' => $filename,
+                    'tmp_name' => $_FILES['documento']['tmp_name'],
+                    'error' => $error,
+                    'dir_writable' => is_writable($upload_dir),
+                    'dir_exists' => is_dir($upload_dir),
+                    'file_uploaded' => is_uploaded_file($_FILES['documento']['tmp_name'])
+                ]
+            ]);
+            $conn->close();
+            exit;
+        }
+    }
+
+    // Calcular días hábiles
+    $dias_habiles = $validacion['dias_habiles'];
+    $aprobador_rol = $validacion['aprobador_rol'];
+    $dias_total = (int)$dias_habiles;
+
+    // Insertar solicitud con los nuevos campos
+    $sql = "INSERT INTO solicitudes
+            (usuario_id, tipo, fecha_inicio, fecha_fin, dias, dias_habiles, motivo,
+             estado, prioridad, aprobador_rol, documento_adjunto, tipo_documento,
+             validacion_disponibilidad, fecha_creacion)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'pendiente', 'media', ?, ?, ?, 1, NOW())";
+
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error al preparar consulta: ' . $conn->error
+        ]);
+        $conn->close();
+        exit;
+    }
+
+    // i=integer, s=string, d=double
+    // usuario_id(i), tipo(s), fecha_inicio(s), fecha_fin(s), dias(i), dias_habiles(i), motivo(s), aprobador_rol(s), documento_adjunto(s), tipo_documento(s)
+    $stmt->bind_param('isssiissss',
+        $user['id'],
+        $tipo,
+        $fecha_inicio,
+        $fecha_fin,
+        $dias_total,
+        $dias_total,
+        $motivo,
+        $aprobador_rol,
+        $documento_path,
+        $tipo_documento
+    );
+
+    if (!$stmt->execute()) {
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error al crear solicitud: ' . $stmt->error
+        ]);
+        $stmt->close();
+        $conn->close();
+        exit;
+    }
+
+    $insertId = $stmt->insert_id;
+    $stmt->close();
+
+    // Insertar actividad
+    $desc = "Envió nueva solicitud ID {$insertId}";
+    $stmt = $conn->prepare("INSERT INTO actividad (usuario_id, tipo, descripcion) VALUES (?, 'solicitud', ?)");
+    if ($stmt) {
+        $stmt->bind_param('is', $user['id'], $desc);
         $stmt->execute();
-        $insertId = $stmt->insert_id;
         $stmt->close();
     }
 
-    // insert activity
-    $desc = 'Envió nueva solicitud ID ' . $insertId;
-    $stmt = $conn->prepare("INSERT INTO actividad (usuario_id, tipo, descripcion) VALUES (?, 'solicitud', ?) ");
-    $stmt->bind_param('is', $user['id'], $desc);
-    $stmt->execute();
-    $stmt->close();
+    $conn->close();
 
-    echo json_encode(['success' => true, 'id' => $insertId]);
+    echo json_encode([
+        'success' => true,
+        'id' => $insertId,
+        'message' => 'Solicitud creada exitosamente',
+        'warnings' => $validacion['warnings'] ?? []
+    ]);
     exit;
 
 } catch (Exception $e) {
+    error_log("Error en solicitud_create.php: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => $e->getMessage()]);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Error del servidor',
+        'message' => $e->getMessage()
+    ]);
+    if (isset($conn)) {
+        $conn->close();
+    }
     exit;
-}
-
-?>
+}   

@@ -15,15 +15,16 @@ $usuario['iniciales'] = substr($nombre_partes[0], 0, 1) . (isset($nombre_partes[
 
 $page_title = 'Calendario';
 
-// Cargar eventos desde la base de datos
+// Cargar eventos y vacaciones desde la base de datos
 $eventos_calendario = [];
 $proximos_eventos = [];
+$stats = ['total_vacaciones' => 0, 'activas_hoy' => 0, 'proximas' => 0, 'departamentos' => []];
 
 try {
     $conn = getConnection();
 
-    // Cargar todos los eventos para el calendario
-    $sql = "SELECT
+    // 1. Cargar eventos regulares
+    $sql_eventos = "SELECT
         e.id,
         e.titulo,
         e.descripcion,
@@ -36,11 +37,11 @@ try {
     LEFT JOIN usuarios u ON u.id = e.usuario_id
     ORDER BY e.fecha_inicio ASC";
 
-    $result = $conn->query($sql);
+    $result = $conn->query($sql_eventos);
     if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $eventos_calendario[] = [
-                'id' => (int)$row['id'],
+                'id' => 'evento_' . $row['id'],
                 'titulo' => $row['titulo'],
                 'descripcion' => $row['descripcion'] ?? '',
                 'fecha' => $row['fecha_inicio'],
@@ -48,23 +49,94 @@ try {
                 'fecha_fin' => $row['fecha_fin'],
                 'tipo' => $row['tipo'],
                 'color' => $row['color'] ?? '#0B8A3A',
-                'usuario' => $row['usuario_nombre']
+                'usuario' => $row['usuario_nombre'],
+                'es_vacacion' => false
             ];
         }
     }
 
-    // Cargar próximos eventos (futuros o de hoy)
-    $sql_proximos = "SELECT
-        e.id,
-        e.titulo,
-        e.fecha_inicio,
-        e.tipo,
-        COALESCE(u.nombre, 'Sistema') AS usuario_nombre
-    FROM eventos e
-    LEFT JOIN usuarios u ON u.id = e.usuario_id
-    WHERE e.fecha_inicio >= CURDATE()
-    ORDER BY e.fecha_inicio ASC
-    LIMIT 10";
+    // 2. Cargar vacaciones aprobadas
+    $sql_vacaciones = "SELECT
+        s.id,
+        s.fecha_inicio,
+        s.fecha_fin,
+        s.tipo,
+        s.motivo,
+        s.dias_habiles,
+        u.nombre AS empleado_nombre,
+        u.departamento,
+        u.email
+    FROM solicitudes s
+    JOIN usuarios u ON u.id = s.usuario_id
+    WHERE s.estado = 'aprobado'
+    AND s.tipo = 'vacaciones'
+    ORDER BY s.fecha_inicio ASC";
+
+    $result_vac = $conn->query($sql_vacaciones);
+    if ($result_vac && $result_vac->num_rows > 0) {
+        while ($row = $result_vac->fetch_assoc()) {
+            $hoy = date('Y-m-d');
+            $es_activa = ($row['fecha_inicio'] <= $hoy && $row['fecha_fin'] >= $hoy);
+            $es_proxima = ($row['fecha_inicio'] > $hoy && $row['fecha_inicio'] <= date('Y-m-d', strtotime('+7 days')));
+
+            // Colorear por departamento
+            $colores_dept = [
+                'Recursos Humanos' => '#8B5CF6',
+                'TI' => '#3B82F6',
+                'Ventas' => '#10B981',
+                'Finanzas' => '#F59E0B',
+                'General' => '#6B7280'
+            ];
+            $color = $colores_dept[$row['departamento'] ?? 'General'] ?? '#6366F1';
+
+            $eventos_calendario[] = [
+                'id' => 'vacacion_' . $row['id'],
+                'titulo' => '🏖️ ' . $row['empleado_nombre'],
+                'descripcion' => $row['motivo'] ?? 'Vacaciones',
+                'fecha' => $row['fecha_inicio'],
+                'fecha_inicio' => $row['fecha_inicio'],
+                'fecha_fin' => $row['fecha_fin'],
+                'tipo' => 'vacaciones',
+                'color' => $color,
+                'usuario' => $row['empleado_nombre'],
+                'departamento' => $row['departamento'] ?? 'General',
+                'email' => $row['email'],
+                'dias_habiles' => $row['dias_habiles'],
+                'es_vacacion' => true
+            ];
+
+            // Estadísticas
+            $stats['total_vacaciones']++;
+            if ($es_activa) $stats['activas_hoy']++;
+            if ($es_proxima) $stats['proximas']++;
+
+            $dept = $row['departamento'] ?? 'General';
+            if (!isset($stats['departamentos'][$dept])) {
+                $stats['departamentos'][$dept] = 0;
+            }
+            $stats['departamentos'][$dept]++;
+        }
+    }
+
+    // 3. Cargar próximos eventos (eventos + vacaciones futuras)
+    $sql_proximos = "
+        SELECT 'evento' as source, e.titulo, e.fecha_inicio, e.tipo, COALESCE(u.nombre, 'Sistema') AS usuario_nombre
+        FROM eventos e
+        LEFT JOIN usuarios u ON u.id = e.usuario_id
+        WHERE e.fecha_inicio >= CURDATE()
+        UNION ALL
+        SELECT 'vacacion' as source,
+               CONCAT('🏖️ ', u.nombre) as titulo,
+               s.fecha_inicio,
+               'vacaciones' as tipo,
+               u.nombre AS usuario_nombre
+        FROM solicitudes s
+        JOIN usuarios u ON u.id = s.usuario_id
+        WHERE s.estado = 'aprobado'
+        AND s.tipo = 'vacaciones'
+        AND s.fecha_inicio >= CURDATE()
+        ORDER BY fecha_inicio ASC
+        LIMIT 10";
 
     $result_proximos = $conn->query($sql_proximos);
     if ($result_proximos && $result_proximos->num_rows > 0) {
@@ -73,7 +145,8 @@ try {
                 'titulo' => $row['titulo'],
                 'fecha' => $row['fecha_inicio'],
                 'tipo' => $row['tipo'],
-                'usuario' => $row['usuario_nombre']
+                'usuario' => $row['usuario_nombre'],
+                'es_vacacion' => $row['source'] === 'vacacion'
             ];
         }
     }
@@ -81,12 +154,6 @@ try {
     $conn->close();
 } catch (Exception $e) {
     error_log("Error cargando eventos: " . $e->getMessage());
-    // Usar datos mock como fallback (ya cargados)
-}
-
-// Si no hay eventos de la BD, usar los del mock_data
-if (empty($proximos_eventos) && !empty($eventos_calendario)) {
-    $proximos_eventos = array_slice($eventos_calendario, 0, 10);
 }
 
 include __DIR__ . '/../includes/head.php';
@@ -98,8 +165,47 @@ include __DIR__ . '/../includes/header.php';
     <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Calendario de Ausencias</h1>
-            <p class="text-gray-600">Visualiza y gestiona todas las ausencias, vacaciones y eventos del equipo.</p>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Calendario de Vacaciones</h1>
+            <p class="text-gray-600">Visualiza las vacaciones y ausencias del equipo en tiempo real.</p>
+        </div>
+
+        <!-- Stats de Vacaciones -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Total Vacaciones</p>
+                        <p class="text-3xl font-bold text-blue-600"><?= $stats['total_vacaciones'] ?></p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-umbrella-beach text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Activas Hoy</p>
+                        <p class="text-3xl font-bold text-green-600"><?= $stats['activas_hoy'] ?></p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-plane-departure text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">Próximas (7 días)</p>
+                        <p class="text-3xl font-bold text-orange-600"><?= $stats['proximas'] ?></p>
+                    </div>
+                    <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-calendar-alt text-orange-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
@@ -144,25 +250,44 @@ include __DIR__ . '/../includes/header.php';
                     </div>
                 </div>
 
-                <!-- Leyenda -->
+                <!-- Leyenda de Colores por Departamento -->
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Tipos de Eventos</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Colores por Departamento</h3>
                     <div class="space-y-3">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-4 h-4 rounded bg-green-500"></div>
-                            <span class="text-sm text-gray-700">Vacaciones</span>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-4 h-4 rounded" style="background-color: #8B5CF6;"></div>
+                                <span class="text-sm text-gray-700">Recursos Humanos</span>
+                            </div>
+                            <span class="text-xs text-gray-500"><?= $stats['departamentos']['Recursos Humanos'] ?? 0 ?></span>
                         </div>
-                        <div class="flex items-center space-x-3">
-                            <div class="w-4 h-4 rounded bg-yellow-500"></div>
-                            <span class="text-sm text-gray-700">Permisos</span>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-4 h-4 rounded" style="background-color: #3B82F6;"></div>
+                                <span class="text-sm text-gray-700">TI</span>
+                            </div>
+                            <span class="text-xs text-gray-500"><?= $stats['departamentos']['TI'] ?? 0 ?></span>
                         </div>
-                        <div class="flex items-center space-x-3">
-                            <div class="w-4 h-4 rounded bg-blue-500"></div>
-                            <span class="text-sm text-gray-700">Reuniones</span>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-4 h-4 rounded" style="background-color: #10B981;"></div>
+                                <span class="text-sm text-gray-700">Ventas</span>
+                            </div>
+                            <span class="text-xs text-gray-500"><?= $stats['departamentos']['Ventas'] ?? 0 ?></span>
                         </div>
-                        <div class="flex items-center space-x-3">
-                            <div class="w-4 h-4 rounded bg-purple-500"></div>
-                            <span class="text-sm text-gray-700">Teletrabajo</span>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-4 h-4 rounded" style="background-color: #F59E0B;"></div>
+                                <span class="text-sm text-gray-700">Finanzas</span>
+                            </div>
+                            <span class="text-xs text-gray-500"><?= $stats['departamentos']['Finanzas'] ?? 0 ?></span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-4 h-4 rounded" style="background-color: #6B7280;"></div>
+                                <span class="text-sm text-gray-700">General</span>
+                            </div>
+                            <span class="text-xs text-gray-500"><?= $stats['departamentos']['General'] ?? 0 ?></span>
                         </div>
                     </div>
                 </div>
@@ -172,20 +297,31 @@ include __DIR__ . '/../includes/header.php';
 </main>
 
 <script>
-// Eventos cargados desde la base de datos
+// Eventos y vacaciones cargados desde la base de datos
 window.calendarEvents = [
     <?php if (!empty($eventos_calendario)): ?>
         <?php foreach ($eventos_calendario as $index => $evento): ?>
         {
-            id: <?= $evento['id'] ?>,
+            id: '<?= addslashes($evento['id']) ?>',
             title: '<?= addslashes($evento['titulo']) ?>',
             start: '<?= $evento['fecha_inicio'] ?>',
             end: '<?= $evento['fecha_fin'] ?>',
-            color: '<?= $evento['color'] ?>',
+            backgroundColor: '<?= $evento['color'] ?>',
+            borderColor: '<?= $evento['color'] ?>',
             extendedProps: {
                 tipo: '<?= addslashes($evento['tipo']) ?>',
                 descripcion: '<?= addslashes($evento['descripcion']) ?>',
-                usuario: '<?= addslashes($evento['usuario']) ?>'
+                usuario: '<?= addslashes($evento['usuario']) ?>',
+                esVacacion: <?= $evento['es_vacacion'] ? 'true' : 'false' ?>,
+                <?php if (!empty($evento['departamento'])): ?>
+                departamento: '<?= addslashes($evento['departamento']) ?>',
+                <?php endif; ?>
+                <?php if (!empty($evento['email'])): ?>
+                email: '<?= addslashes($evento['email']) ?>',
+                <?php endif; ?>
+                <?php if (isset($evento['dias_habiles'])): ?>
+                diasHabiles: <?= $evento['dias_habiles'] ?>
+                <?php endif; ?>
             }
         }<?= $index < count($eventos_calendario) - 1 ? ',' : '' ?>
         <?php endforeach; ?>
@@ -193,6 +329,7 @@ window.calendarEvents = [
 ];
 
 console.log('Eventos cargados:', window.calendarEvents.length);
+console.log('Vacaciones:', window.calendarEvents.filter(e => e.extendedProps.esVacacion).length);
 </script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

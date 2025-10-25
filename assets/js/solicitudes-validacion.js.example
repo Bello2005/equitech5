@@ -1,0 +1,53 @@
+// Manejo de errores mejorado para cargarDiasDisponibles
+async function cargarDiasDisponibles() {
+    try {
+        const res = await fetch('api/validar_solicitud.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                tipo: 'vacaciones',
+                fecha_inicio: '',
+                fecha_fin: ''
+            })
+        });
+
+        const data = await res.json();
+        
+        if (!res.ok) {
+            switch(data.code) {
+                case 'NOT_AUTHENTICATED':
+                case 'INVALID_SESSION':
+                    // Redirigir al login
+                    window.location.href = '/Comfachoco/pages/login.php';
+                    return;
+                case 'USER_NOT_FOUND':
+                    // Usuario en sesión no existe en BD
+                    alert('Tu usuario no está registrado en el sistema. Contacta a RRHH.');
+                    return;
+                case 'INVALID_REQUEST_DATA':
+                    console.error('Error en datos de solicitud:', data.mensaje);
+                    return;
+                case 'VALIDATION_ERROR':
+                    console.error('Error validando solicitud:', data.mensaje);
+                    return;
+                default:
+                    throw new Error(data.mensaje || 'Error desconocido');
+            }
+        }
+
+        if (data.dias_disponibles) {
+            const diasDisp = data.dias_disponibles.total || 0;
+            const periodosCompletos = data.dias_disponibles.periodos_completos || 0;
+            const diasGanados = data.dias_disponibles.ganados || 0;
+            const diasUsados = data.dias_disponibles.usados || 0;
+
+            document.getElementById('dias-disponibles-numero').textContent = diasDisp.toFixed(1);
+            document.getElementById('periodos-info').textContent =
+                `${periodosCompletos} período${periodosCompletos !== 1 ? 's' : ''} completado${periodosCompletos !== 1 ? 's' : ''} • ${diasGanados} ganados - ${diasUsados} usados`;
+            document.getElementById('info-dias-disponibles').classList.remove('hidden');
+        }
+    } catch (err) {
+        console.error('Error cargando días disponibles:', err);
+        alert('No se pudieron cargar los días disponibles. Por favor recarga la página.');
+    }
+}

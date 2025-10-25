@@ -6,7 +6,16 @@
     <title><?= $page_title ?? 'Dashboard' ?> - ComfaChoco International</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <?php
+    // Preferir el CSS compilado localmente en producción. Si no existe, caer al CDN para desarrollo rápido.
+    $compiledTailwind = __DIR__ . '/../assets/css/styles.css';
+    if (file_exists($compiledTailwind)) {
+        echo '<link href="../assets/css/styles.css" rel="stylesheet">\n';
+    } else {
+        // En desarrollo rápido todavía podemos usar el CDN, pero no recomendado en producción
+        echo '<script src="https://cdn.tailwindcss.com"></script>\n';
+    }
+    ?>
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>

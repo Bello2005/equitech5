@@ -286,6 +286,162 @@ try {
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
 
+<!-- Script de validación en tiempo real -->
+<script src="../assets/js/solicitudes-validacion.js"></script>
+
+<!-- Modal para nueva solicitud -->
+<div id="modal-nueva-solicitud" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+    <div class="relative top-10 mx-auto p-6 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-2xl bg-white mb-10">
+        <div class="mt-3">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">Nueva Solicitud</h3>
+                <button id="close-modal-nueva" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Card de días disponibles -->
+            <div id="info-dias-disponibles" class="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-xl p-4 mb-6 hidden">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-green-700 font-medium mb-1">Tus días de vacaciones disponibles</p>
+                        <p class="text-3xl font-bold text-green-800"><span id="dias-disponibles-numero">0</span> días</p>
+                        <p class="text-xs text-green-600 mt-1">
+                            <span id="periodos-info"></span>
+                        </p>
+                    </div>
+                    <div class="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-umbrella-beach text-white text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario -->
+            <form id="form-nueva-solicitud" class="space-y-5">
+                <!-- Tipo de permiso -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Tipo de permiso <span class="text-red-500">*</span>
+                    </label>
+                    <select id="tipo-permiso" name="tipo" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition">
+                        <option value="">Selecciona un tipo</option>
+                        <option value="vacaciones">Vacaciones</option>
+                        <option value="permiso_medico">Permiso Médico</option>
+                        <option value="maternidad">Maternidad</option>
+                        <option value="paternidad">Paternidad</option>
+                        <option value="duelo">Duelo</option>
+                        <option value="jurado">Jurado</option>
+                        <option value="cita_medica_hijo">Cita Médica de Hijo/a</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+
+                <!-- Fechas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Fecha inicio <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" id="fecha-inicio" name="fecha_inicio" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Fecha fin <span class="text-red-500">*</span>
+                        </label>
+                        <input type="date" id="fecha-fin" name="fecha_fin" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition">
+                    </div>
+                </div>
+
+                <!-- Días calculados -->
+                <div id="info-dias-calculados" class="bg-blue-50 border border-blue-200 rounded-xl p-4 hidden">
+                    <div class="flex items-center">
+                        <i class="fas fa-calendar-check text-blue-600 text-xl mr-3"></i>
+                        <div>
+                            <p class="text-sm font-semibold text-blue-900">Días hábiles calculados</p>
+                            <p class="text-2xl font-bold text-blue-700"><span id="dias-habiles-calculados">0</span> días</p>
+                            <p class="text-xs text-blue-600">Los sábados cuentan como días hábiles</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Motivo -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Motivo <span class="text-red-500">*</span>
+                    </label>
+                    <textarea id="motivo" name="motivo" rows="3" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition" placeholder="Describe brevemente el motivo de tu solicitud"></textarea>
+                </div>
+
+                <!-- Documento requerido -->
+                <div id="info-documento" class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 hidden">
+                    <div class="flex items-start">
+                        <i class="fas fa-file-medical text-yellow-600 text-xl mr-3 mt-1"></i>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-yellow-900 mb-1">Documento requerido</p>
+                            <p class="text-sm text-yellow-700" id="tipo-documento-texto">Este tipo de permiso requiere documentación</p>
+                            <div class="mt-3">
+                                <label class="block text-xs font-medium text-yellow-800 mb-2">Adjuntar documento</label>
+                                <input type="file" id="documento-adjunto" name="documento" accept=".pdf,.jpg,.jpeg,.png" class="text-sm text-yellow-700">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aprobador asignado -->
+                <div id="info-aprobador" class="bg-purple-50 border border-purple-200 rounded-xl p-4 hidden">
+                    <div class="flex items-center">
+                        <i class="fas fa-user-check text-purple-600 text-xl mr-3"></i>
+                        <div>
+                            <p class="text-xs text-purple-700 font-medium mb-1">Será revisado por</p>
+                            <p class="text-lg font-bold text-purple-900" id="aprobador-texto">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disponibilidad departamento -->
+                <div id="info-disponibilidad-dept" class="hidden">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+
+                <!-- Errores de validación -->
+                <div id="validation-errors" class="hidden bg-red-50 border border-red-200 rounded-xl p-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-circle text-red-600 text-xl mr-3 mt-1"></i>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-red-900 mb-2">Errores de validación</p>
+                            <ul id="error-list" class="list-disc list-inside text-sm text-red-700 space-y-1">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warnings -->
+                <div id="validation-warnings" class="hidden bg-orange-50 border border-orange-200 rounded-xl p-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-triangle text-orange-600 text-xl mr-3 mt-1"></i>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-orange-900 mb-2">Advertencias</p>
+                            <ul id="warning-list" class="list-disc list-inside text-sm text-orange-700 space-y-1">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex justify-end space-x-3 pt-4 border-t">
+                    <button type="button" id="btn-cancelar-nueva" class="px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="btn-submit-solicitud" class="px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition shadow-sm">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Enviar Solicitud
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Modal para ver detalles de solicitud -->
 <div id="modal-detalle" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
     <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-1/2 shadow-lg rounded-2xl bg-white">
@@ -304,45 +460,8 @@ try {
 </div>
 
 <script>
-// Handler para crear nueva solicitud
+// Modal de detalles y acciones de aprobación/rechazo
 document.addEventListener('DOMContentLoaded', function() {
-    const btnNew = document.getElementById('btn-new-solicitud');
-    if (btnNew) {
-        btnNew.addEventListener('click', async function() {
-            const tipo = prompt('Tipo de permiso (ej: Vacaciones, Enfermedad, Permiso personal):');
-            if (!tipo) return alert('Tipo requerido');
-            const fecha_inicio = prompt('Fecha inicio (YYYY-MM-DD):');
-            if (!fecha_inicio) return alert('Fecha inicio requerido');
-            const fecha_fin = prompt('Fecha fin (YYYY-MM-DD):');
-            if (!fecha_fin) return alert('Fecha fin requerido');
-            const dias = prompt('Número de días:');
-            if (!dias) return alert('Días requeridos');
-            const motivo = prompt('Motivo (opcional):') || '';
-
-            const form = new FormData();
-            form.append('tipo', tipo);
-            form.append('fecha_inicio', fecha_inicio);
-            form.append('fecha_fin', fecha_fin);
-            form.append('dias', dias);
-            form.append('motivo', motivo);
-
-            try {
-                const res = await fetch('api/solicitud_create.php', { method: 'POST', body: form });
-                if (!res.ok) throw new Error('Error creando solicitud');
-                const data = await res.json();
-                if (data && data.success) {
-                    alert('Solicitud enviada');
-                    location.reload();
-                } else {
-                    alert(data.message || 'Error al crear solicitud');
-                }
-            } catch (err) {
-                console.error(err);
-                alert('Error de red al crear solicitud');
-            }
-        });
-    }
-
     // Modal de detalles
     const modal = document.getElementById('modal-detalle');
     const modalContent = document.getElementById('modal-content');
