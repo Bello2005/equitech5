@@ -1,3 +1,8 @@
+##Imágenes del diseño
+!(https://github.com/user-attachments/assets/bc305d1c-5dfa-4acc-83d3-462b17428037)
+!(https://github.com/user-attachments/assets/16a14f92-08b2-48a7-8f3a-69e30ddacb4a)
+
+
 # ComfaChoco - Sistema de Gestión de Recursos Humanos
 
 Sistema integral de gestión de recursos humanos para ComfaChoco, desarrollado con PHP 8.2, MySQL y TailwindCSS.
