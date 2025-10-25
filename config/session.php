@@ -34,7 +34,7 @@ function requireLogin() {
     if (!isLoggedIn()) {
         // Usar APP_URL de .env (si está configurado) o fallback con la ruta correcta
         $app_url = env('APP_URL', '/Comfachoco');
-        header("Location: {$app_url}/index.php");
+        header("Location: {$app_url}/pages/login.php");
         exit();
     }
 }
@@ -57,22 +57,24 @@ function getCurrentUser() {
 
 // Función para cerrar sesión
 function logout() {
-    // Limpiar todas las variables de sesión
-    $_SESSION = [];
-
-    // Destruir la cookie de sesión
-    if (ini_get("session.use_cookies")) {
-        $params = session_get_cookie_params();
-        setcookie(session_name(), '', time() - 42000,
-            $params["path"], $params["domain"],
-            $params["secure"], $params["httponly"]
-        );
+    // Guardar el rol antes de destruir la sesión
+    $wasAdmin = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
+    
+    // Limpiar y destruir la sesión
+    $_SESSION = array();
+    
+    // Eliminar la cookie de sesión
+    if (isset($_COOKIE[session_name()])) {
+        setcookie(session_name(), '', time()-42000, '/');
     }
-
-    // Destruir la sesión
+    
     session_destroy();
-
-    $app_url = env('APP_URL', '/Comfachoco');
-    header("Location: {$app_url}/index.php");
+    
+    // Redirigir según el rol que tenía el usuario
+    if ($wasAdmin) {
+        header('Location: /Comfachoco/pages/admin-login.php');
+    } else {
+        header('Location: /Comfachoco/pages/login.php');
+    }
     exit();
 }

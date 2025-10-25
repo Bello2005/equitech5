@@ -1,4 +1,5 @@
 <?php
+ob_start(); // Capturar cualquier salida
 require_once __DIR__ . '/../config/session.php';
 require_once __DIR__ . '/../config/mock_data.php';
 
@@ -122,10 +123,6 @@ try {
                                     </div>
                                 </div>
                                 <div class="flex space-x-3">
-                                    <button id="btn-new-solicitud" class="inline-flex items-center px-6 py-3 bg-primary text-white font-semibold rounded-2xl hover:bg-primary-dark transition-all duration-200 shadow-md hover:shadow-lg">
-                                        <i class="fas fa-plus mr-2"></i>
-                                        Nueva Solicitud
-                                    </button>
                                     <button id="btn-dashboard-export" class="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-2xl hover:bg-gray-50 transition-all duration-200 shadow-sm">
                                         <i class="fas fa-download mr-2"></i>
                                         Exportar
@@ -133,26 +130,7 @@ try {
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-6 bg-gradient-to-r from-primary to-primary-dark rounded-2xl p-8 text-white shadow-elegant">
-                            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-                                <div>
-                                    <h2 class="text-2xl font-bold mb-2">¡Excelente trabajo esta semana!</h2>
-                                    <p class="text-primary-100 opacity-90 max-w-2xl">
-                                        Has aprobado 12 solicitudes y el índice de satisfacción del equipo ha aumentado un 5%.
-                                        Sigue así para mantener un ambiente laboral saludable.
-                                    </p>
-                                </div>
-                                <div class="mt-4 lg:mt-0">
-                                    <div class="flex items-center space-x-2 bg-white/20 rounded-2xl p-4 backdrop-blur-sm">
-                                        <i class="fas fa-trophy text-2xl text-accent"></i>
-                                        <div>
-                                            <p class="text-sm opacity-90">Ranking del mes</p>
-                                            <p class="text-xl font-bold">#1 en eficiencia</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
 
                     <!-- Enhanced KPI Cards Grid -->

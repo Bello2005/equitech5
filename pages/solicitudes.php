@@ -178,12 +178,7 @@ try {
                     <h3 class="text-xl font-semibold text-gray-900 mb-2 lg:mb-0">
                         Todas las Solicitudes
                     </h3>
-                    <div class="flex space-x-2">
-                        <button id="btn-new-solicitud" type="button" class="inline-flex items-center px-4 py-2 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary-dark transition-all duration-200 shadow-sm">
-                            <i class="fas fa-plus mr-2"></i>
-                            Nueva Solicitud
-                        </button>
-                    </div>
+
                 </div>
             </div>
             <div class="overflow-x-auto">

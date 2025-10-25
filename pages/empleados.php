@@ -207,17 +207,117 @@ include __DIR__ . '/../includes/header.php';
                         </div>
 
                         <div class="flex items-center justify-between pt-4 border-t border-gray-200">
-                            <a href="mailto:<?= $miembro['email'] ?>" class="text-primary hover:text-primary-dark text-sm">
-                                <i class="fas fa-envelope mr-1"></i>
-                                Email
-                            </a>
-                            <button type="button" class="btn-opciones text-gray-600 hover:text-gray-900" data-email="<?= $miembro['email'] ?>" data-nombre="<?= $miembro['nombre'] ?>">
-                                <i class="fas fa-ellipsis-h"></i>
+                            <button type="button" class="text-primary hover:text-primary-dark text-sm editar-empleado" 
+                                    data-id="<?= $miembro['id'] ?>"
+                                    data-cedula="<?= $miembro['cedula'] ?>"
+                                    data-primer-nombre="<?= $miembro['primer_nombre'] ?>"
+                                    data-primer-apellido="<?= $miembro['primer_apellido'] ?>"
+                                    data-tipo-empleado="<?= $miembro['tipo_empleado_id'] ?>"
+                                    data-departamento="<?= $miembro['departamento'] ?>">
+                                <i class="fas fa-edit mr-1"></i>
+                                Editar
+                            </button>
+                            <button type="button" class="btn-opciones text-gray-600 hover:text-gray-900" data-id="<?= $miembro['id'] ?>">
+                                <i class="fas fa-ellipsis-v"></i>
                             </button>
                         </div>
                     </div>
                     <?php endforeach; ?>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar empleado -->
+    <div id="modal-editar-empleado" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
+        <div class="relative top-10 mx-auto p-6 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-2xl bg-white mb-10">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900">Editar Empleado</h3>
+                    <button id="close-modal-editar" class="text-gray-400 hover:text-gray-600 transition">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <form id="form-editar-empleado" class="space-y-5">
+                    <input type="hidden" id="editar-empleado-id" name="id">
+                    
+                    <!-- Cédula -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Cédula <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="editar-empleado-cedula" name="cedula" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                               placeholder="Ej: 1234567890">
+                    </div>
+
+                    <!-- Nombre y Apellido -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Primer Nombre <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" id="editar-empleado-primer-nombre" name="primer_nombre" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                                   placeholder="Ej: Juan">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Primer Apellido <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" id="editar-empleado-primer-apellido" name="primer_apellido" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                                   placeholder="Ej: Pérez">
+                        </div>
+                    </div>
+
+                    <!-- Tipo de Empleado y Departamento -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Tipo de Empleado <span class="text-red-500">*</span>
+                            </label>
+                            <select id="editar-empleado-tipo" name="tipo_empleado_id" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition">
+                                <option value="">Seleccionar tipo</option>
+                                <?php
+                                try {
+                                    $conn = getConnection();
+                                    $result = $conn->query("SELECT id, nombre FROM tipos_empleado WHERE activo = 1 ORDER BY nombre");
+                                    while ($row = $result->fetch_assoc()) {
+                                        echo '<option value="' . $row['id'] . '">' . htmlspecialchars($row['nombre']) . '</option>';
+                                    }
+                                    $conn->close();
+                                } catch (Exception $e) {
+                                    error_log("Error cargando tipos: " . $e->getMessage());
+                                }
+                                ?>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Departamento <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" id="editar-empleado-departamento" name="departamento" required
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                                   placeholder="Ej: Recursos Humanos">
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="flex justify-end space-x-3 pt-4 border-t">
+                        <button type="button" id="btn-cancelar-editar" class="px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition">
+                            Cancelar
+                        </button>
+                        <button type="submit" id="btn-submit-editar" class="px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition shadow-sm">
+                            <i class="fas fa-save mr-2"></i>
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -237,41 +337,39 @@ include __DIR__ . '/../includes/header.php';
             </div>
 
             <form id="form-nuevo-empleado" class="space-y-5">
-                <!-- Nombre -->
+                <!-- Cédula -->
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        Nombre Completo <span class="text-red-500">*</span>
+                        Cédula <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" id="empleado-nombre" name="nombre" required
+                    <input type="text" id="empleado-cedula" name="cedula" required
                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition"
-                           placeholder="Ej: Juan Pérez García">
+                           placeholder="Ej: 1234567890">
                 </div>
 
-                <!-- Email -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        Email <span class="text-red-500">*</span>
-                    </label>
-                    <input type="email" id="empleado-email" name="email" required
-                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition"
-                           placeholder="ejemplo@comfachoco.com">
-                </div>
-
-                <!-- Rol y Tipo de Empleado -->
+                <!-- Nombre y Apellido -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            Rol <span class="text-red-500">*</span>
+                            Primer Nombre <span class="text-red-500">*</span>
                         </label>
-                        <select id="empleado-rol" name="rol" required
-                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition">
-                            <option value="">Seleccionar rol</option>
-                            <option value="empleado">Empleado</option>
-                            <option value="gerente">Gerente</option>
-                            <option value="admin">Administrador</option>
-                        </select>
+                        <input type="text" id="empleado-primer-nombre" name="primer_nombre" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                               placeholder="Ej: Juan">
                     </div>
 
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Primer Apellido <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="empleado-primer-apellido" name="primer_apellido" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition"
+                               placeholder="Ej: Pérez">
+                    </div>
+                </div>
+
+                <!-- Tipo de Empleado y Departamento -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             Tipo de Empleado <span class="text-red-500">*</span>
@@ -293,10 +391,7 @@ include __DIR__ . '/../includes/header.php';
                             ?>
                         </select>
                     </div>
-                </div>
 
-                <!-- Departamento y Fecha de Ingreso -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             Departamento <span class="text-red-500">*</span>
@@ -305,25 +400,6 @@ include __DIR__ . '/../includes/header.php';
                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition"
                                placeholder="Ej: Recursos Humanos">
                     </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            Fecha de Ingreso <span class="text-red-500">*</span>
-                        </label>
-                        <input type="date" id="empleado-fecha-ingreso" name="fecha_ingreso" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition">
-                    </div>
-                </div>
-
-                <!-- Contraseña -->
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        Contraseña <span class="text-red-500">*</span>
-                    </label>
-                    <input type="password" id="empleado-password" name="password" required
-                           class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition"
-                           placeholder="Mínimo 6 caracteres">
-                    <p class="text-xs text-gray-500 mt-1">El empleado podrá cambiar su contraseña después</p>
                 </div>
 
                 <!-- Botones -->
@@ -410,72 +486,190 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Handler para editar empleado
+    const modalEditar = document.getElementById('modal-editar-empleado');
+    const formEditar = document.getElementById('form-editar-empleado');
+    const closeModalEditar = document.getElementById('close-modal-editar');
+    const btnCancelarEditar = document.getElementById('btn-cancelar-editar');
+
+    // Cerrar modal de edición
+    const cerrarModalEditar = () => {
+        modalEditar.classList.add('hidden');
+        formEditar.reset();
+    };
+
+    if (closeModalEditar) closeModalEditar.addEventListener('click', cerrarModalEditar);
+    if (btnCancelarEditar) btnCancelarEditar.addEventListener('click', cerrarModalEditar);
+
+    // Cerrar al hacer clic fuera
+    modalEditar?.addEventListener('click', function(e) {
+        if (e.target === modalEditar) cerrarModalEditar();
+    });
+
+    // Abrir modal de edición
+    document.querySelectorAll('.editar-empleado').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const cedula = this.getAttribute('data-cedula');
+            const primerNombre = this.getAttribute('data-primer-nombre');
+            const primerApellido = this.getAttribute('data-primer-apellido');
+            const tipoEmpleado = this.getAttribute('data-tipo-empleado');
+            const departamento = this.getAttribute('data-departamento');
+
+            // Llenar el formulario
+            document.getElementById('editar-empleado-id').value = id;
+            document.getElementById('editar-empleado-cedula').value = cedula;
+            document.getElementById('editar-empleado-primer-nombre').value = primerNombre;
+            document.getElementById('editar-empleado-primer-apellido').value = primerApellido;
+            document.getElementById('editar-empleado-tipo').value = tipoEmpleado;
+            document.getElementById('editar-empleado-departamento').value = departamento;
+
+            modalEditar.classList.remove('hidden');
+        });
+    });
+
+    // Submit del formulario de edición
+    if (formEditar) {
+        formEditar.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(formEditar);
+
+            try {
+                const btnSubmit = document.getElementById('btn-submit-editar');
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Guardando...';
+
+                const res = await fetch('api/empleado_update.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!res.ok) throw new Error('Error actualizando empleado');
+
+                const data = await res.json();
+
+                if (data && data.success) {
+                    alert('Empleado actualizado exitosamente');
+                    cerrarModalEditar();
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error al actualizar empleado');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error de red al actualizar empleado');
+            } finally {
+                const btnSubmit = document.getElementById('btn-submit-editar');
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = '<i class="fas fa-save mr-2"></i> Guardar Cambios';
+            }
+        });
+    }
+
     // Handler para menú de opciones
-    document.body.addEventListener('click', function(e) {
-        const btnOpciones = e.target.closest('.btn-opciones');
-        if (btnOpciones) {
-            const nombre = btnOpciones.getAttribute('data-nombre');
-            const email = btnOpciones.getAttribute('data-email');
-            const accion = prompt(`Acción para ${nombre} (${email}):\n1. Editar\n2. Eliminar\n3. Cambiar estado\nEscribe el número de la acción:`);
-            if (!accion) return;
-            if (accion === '1') {
-                // Editar
-                const nuevoPuesto = prompt('Nuevo puesto:');
-                if (!nuevoPuesto) return alert('Puesto requerido');
-                fetch('api/equipo_update.php', {
+    document.querySelectorAll('.btn-opciones').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            
+            const opciones = [
+                { valor: 'eliminar', texto: 'Eliminar empleado' },
+                { valor: 'cambiar-estado', texto: 'Cambiar estado' }
+            ];
+
+            // Crear el menú desplegable
+            const menu = document.createElement('div');
+            menu.className = 'absolute right-0 mt-2 w-48 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50';
+            menu.style.top = '100%';
+
+            const lista = document.createElement('div');
+            lista.className = 'py-1';
+            lista.role = 'menu';
+
+            opciones.forEach(opcion => {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100';
+                item.textContent = opcion.texto;
+                item.addEventListener('click', () => manejarAccion(opcion.valor, id));
+                lista.appendChild(item);
+            });
+
+            menu.appendChild(lista);
+            
+            // Remover menús existentes
+            document.querySelectorAll('.menu-opciones').forEach(m => m.remove());
+            menu.classList.add('menu-opciones');
+            
+            // Posicionar y mostrar el menú
+            this.parentNode.style.position = 'relative';
+            this.parentNode.appendChild(menu);
+            
+            // Cerrar al hacer clic fuera
+            const cerrarMenu = (e) => {
+                if (!menu.contains(e.target) && !this.contains(e.target)) {
+                    menu.remove();
+                    document.removeEventListener('click', cerrarMenu);
+                }
+            };
+            
+            setTimeout(() => document.addEventListener('click', cerrarMenu), 0);
+        });
+    });
+
+    // Función para manejar las acciones del menú
+    async function manejarAccion(accion, id) {
+        if (accion === 'eliminar') {
+            if (!confirm('¿Está seguro que desea eliminar este empleado?')) return;
+            
+            try {
+                const res = await fetch('api/empleado_delete.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email, puesto: nuevoPuesto })
-                }).then(res => res.json()).then(data => {
-                    if (data && data.success) {
-                        alert('Puesto actualizado');
-                        location.reload();
-                    } else {
-                        alert(data.message || 'Error al actualizar');
-                    }
-                }).catch(err => {
-                    console.error(err);
-                    alert('Error de red al actualizar');
+                    body: JSON.stringify({ id: id })
                 });
-            } else if (accion === '2') {
-                // Eliminar
-                if (!confirm('¿Eliminar este miembro?')) return;
-                fetch('api/equipo_delete.php', {
+
+                const data = await res.json();
+
+                if (data && data.success) {
+                    alert('Empleado eliminado exitosamente');
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error al eliminar empleado');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error de red al eliminar empleado');
+            }
+        } else if (accion === 'cambiar-estado') {
+            const estado = prompt('¿Nuevo estado? (activo/inactivo):', 'activo');
+            if (!estado || !['activo', 'inactivo'].includes(estado.toLowerCase())) {
+                return alert('Estado inválido');
+            }
+
+            try {
+                const res = await fetch('api/empleado_update.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email })
-                }).then(res => res.json()).then(data => {
-                    if (data && data.success) {
-                        alert('Miembro eliminado');
-                        location.reload();
-                    } else {
-                        alert(data.message || 'Error al eliminar');
-                    }
-                }).catch(err => {
-                    console.error(err);
-                    alert('Error de red al eliminar');
+                    body: JSON.stringify({ 
+                        id: id, 
+                        activo: estado.toLowerCase() === 'activo' ? 1 : 0 
+                    })
                 });
-            } else if (accion === '3') {
-                // Cambiar estado
-                const nuevoEstado = prompt('Nuevo estado (activo/vacaciones):', 'activo');
-                if (!nuevoEstado) return alert('Estado requerido');
-                fetch('api/equipo_update.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email, estado: nuevoEstado })
-                }).then(res => res.json()).then(data => {
-                    if (data && data.success) {
-                        alert('Estado actualizado');
-                        location.reload();
-                    } else {
-                        alert(data.message || 'Error al actualizar estado');
-                    }
-                }).catch(err => {
-                    console.error(err);
-                    alert('Error de red al actualizar estado');
-                });
+
+                const data = await res.json();
+
+                if (data && data.success) {
+                    alert('Estado actualizado exitosamente');
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error al actualizar estado');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error de red al actualizar estado');
             }
         }
-    });
+    }
 });
 </script>

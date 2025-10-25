@@ -1,5 +1,5 @@
-        <!-- Mobile sidebar backdrop -->
-        <div x-show="sidebarOpen && window.innerWidth < 1024"
+<!-- Mobile sidebar backdrop -->
+<div x-show="sidebarOpen && window.innerWidth < 1024"
              @click="sidebarOpen = false"
              class="fixed inset-0 bg-gray-900 bg-opacity-50 z-40 lg:hidden"
              x-transition:enter="transition-opacity ease-linear duration-300"
@@ -53,11 +53,10 @@
 
                     $menu_items = [
                         ['icon' => 'fas fa-th-large', 'text' => 'Dashboard', 'badge' => '', 'link' => 'dashboard.php'],
-                        ['icon' => 'fas fa-file-alt', 'text' => 'Solicitudes', 'badge' => '8', 'link' => 'solicitudes.php'],
+                        ['icon' => 'fas fa-file-alt', 'text' => 'Solicitudes', 'badge' => '', 'link' => 'solicitudes.php'],
                         ['icon' => 'fas fa-calendar', 'text' => 'Calendario', 'badge' => '', 'link' => 'calendario.php'],
                         ['icon' => 'fas fa-users', 'text' => 'Empleados', 'badge' => '', 'link' => 'empleados.php'],
                         ['icon' => 'fas fa-book', 'text' => 'Políticas', 'badge' => '', 'link' => 'politicas.php'],
-                        ['icon' => 'fas fa-chart-line', 'text' => 'Analytics', 'badge' => 'New', 'link' => 'analytics.php'],
                         ['icon' => 'fas fa-cog', 'text' => 'Configuración', 'badge' => '', 'link' => 'configuracion.php']
                     ];
 

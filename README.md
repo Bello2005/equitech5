@@ -1,103 +1,128 @@
-# ComfaChoco International - Sistema de Gestión de Recursos Humanos
+# ComfaChoco - Sistema de Gestión de Recursos Humanos
 
-Sistema de gestión de recursos humanos desarrollado con PHP puro, diseñado para ComfaChoco International.
+Sistema integral de gestión de recursos humanos para ComfaChoco, desarrollado con PHP 8.2, MySQL y TailwindCSS. 
+Gestiona empleados, vacaciones, permisos y políticas organizacionales de manera eficiente y segura.
+
+## Características Principales
+
+- ✅ Gestión completa de empleados (CRUD)
+- 🔐 Sistema de autenticación y roles (admin, empleado, gerente)
+- 📅 Gestión de vacaciones y permisos
+- 📋 Políticas organizacionales configurables
+- 📊 Dashboards informativos
+- 🎨 Interfaz moderna con TailwindCSS y AlpineJS
+
+## Requisitos del Sistema
+
+- PHP 8.2 o superior
+- MariaDB 10.4 o superior / MySQL 5.7+
+- Apache 2.4 o superior
+- Composer (para dependencias)
+- Node.js y npm (para assets)
+
+### Extensiones PHP Requeridas
+- mysqli
+- session
+- json
+- mbstring
+- fileinfo
 
 ## Estructura del Proyecto
 
-```
-Comfachoco/
-├── assets/
-│   ├── css/              # Archivos CSS
-│   │   ├── animations.css
-│   │   ├── badges.css
-│   │   ├── calendar.css
-│   │   ├── components.css
-│   │   ├── scrollbar.css
-│   │   └── variables.css
-│   ├── js/               # Archivos JavaScript
-│   │   ├── alpine-directives.js
-│   │   ├── calendar.js
-│   │   └── tailwind-config.js
-│   └── images/           # Imágenes del proyecto
-├── config/
-│   ├── auth.php          # Autenticación de usuarios
-│   ├── database.php      # Configuración de base de datos
-│   ├── mock_data.php     # Datos de prueba
-│   └── session.php       # Manejo de sesiones
-├── includes/
-│   ├── footer.php        # Footer del sitio
-│   ├── head.php          # Head HTML y scripts
-│   ├── header.php        # Header/navbar del dashboard
-│   └── sidebar.php       # Sidebar de navegación
-├── pages/
-│   ├── dashboard.php     # Dashboard principal
-│   ├── login.php         # Página de login
-│   └── logout.php        # Cerrar sesión
-├── database.sql          # Script SQL para crear la base de datos
-├── index.php             # Punto de entrada (redirige al login)
-└── README.md             # Este archivo
-```
-
-## Requisitos
-
-- PHP 7.4 o superior
-- MySQL 5.7 o superior
-- Apache/Nginx (XAMPP, LAMPP, WAMP, etc.)
-- Extensiones PHP requeridas:
-  - mysqli
-  - session
-
-## Instalación
-
-### 1. Configurar Variables de Entorno
-
-El proyecto usa variables de entorno para una mayor seguridad. Copia el archivo `.env.example` a `.env`:
-
 ```bash
-cp .env.example .env
+Comfachoco/
+├── api/                  # APIs para operaciones CRUD
+├── assets/              # Recursos estáticos
+│   ├── css/            # Estilos (TailwindCSS)
+│   ├── js/             # Scripts (AlpineJS)
+│   └── images/         # Imágenes
+├── config/             # Configuraciones
+├── includes/           # Componentes PHP reutilizables
+├── lib/               # Librerías de terceros
+├── pages/             # Páginas del sistema
+│   └── api/           # Endpoints de la API
+├── scripts/           # Scripts de utilidad
+└── uploads/           # Archivos subidos
+    └── documentos/    # Documentos de empleados
 ```
 
-Edita el archivo `.env` con tus configuraciones:
+## Instalación Rápida
 
-```env
-# Configuración de Base de Datos
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=comfachoco
-DB_USER=root
-DB_PASS=
-
-# Configuración de la Aplicación
-APP_NAME="ComfaChoco International"
-APP_ENV=development          # development, production
-APP_DEBUG=true              # true para desarrollo, false para producción
-APP_URL=http://localhost/Comfachoco
-
-# Configuración de Sesión
-SESSION_LIFETIME=7200       # Tiempo en segundos (2 horas)
-SESSION_SECURE=false        # true si usas HTTPS
-SESSION_HTTP_ONLY=true      # Protección contra XSS
-
-# Configuración de Seguridad
-APP_KEY=base64:Jx8K9mN3pQ7rT5vW2yZ4bC6dF8gH0jL3nM5oP7qS9tU1
-HASH_ALGORITHM=bcrypt
-
-# Configuración de Zona Horaria
-TIMEZONE=-05:00              # Colombia UTC-5 (usar formato offset para MySQL)
+1. **Clonar el repositorio:**
+```bash
+git clone https://github.com/Bello2005/Comfachoco.git
+cd Comfachoco
 ```
 
-**IMPORTANTE**:
-- El archivo `.env` contiene información sensible y NO debe ser versionado en Git
-- El archivo `.env.example` es la plantilla y SÍ debe estar en Git
-- Cambia `APP_KEY` por un valor único generado aleatoriamente
+2. **Configurar el servidor web:**
+- Copiar el proyecto a tu directorio web (ej: /opt/lampp/htdocs/ para XAMPP)
+- Configurar el virtual host (opcional pero recomendado)
 
-### 2. Configurar la Base de Datos
-
+3. **Configurar la base de datos:**
 ```bash
 # Acceder a MySQL
 mysql -u root -p
 
-# Importar el script SQL
+# Crear la base de datos
+CREATE DATABASE comfachoco CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+# Importar el esquema base
+mysql -u root -p comfachoco < comfachoco.sql
+```
+
+4. **Configurar el entorno:**
+```bash
+# Copiar el archivo de configuración
+cp config/env.example.php config/env.php
+
+# Editar config/env.php con tu configuración
+```
+
+5. **Compilar los assets (si se modifican los estilos):**
+```bash
+# Instalar dependencias
+npm install
+
+# Compilar CSS
+npm run build:css
+```
+
+## Configuración del Entorno de Desarrollo
+
+### Base de Datos
+
+El archivo `config/env.php` debe contener:
+
+```php
+<?php
+return [
+    'DB_HOST' => 'localhost',
+    'DB_NAME' => 'comfachoco',
+    'DB_USER' => 'root',
+    'DB_PASS' => '',
+    'TIMEZONE' => 'America/Bogota'
+];
+```
+
+### Virtual Host (Apache)
+
+Ejemplo de configuración:
+
+```apache
+<VirtualHost *:80>
+    ServerName comfachoco.local
+    DocumentRoot "/opt/lampp/htdocs/Comfachoco"
+    
+    <Directory "/opt/lampp/htdocs/Comfachoco">
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+    
+    ErrorLog "logs/comfachoco-error.log"
+    CustomLog "logs/comfachoco-access.log" combined
+</VirtualHost>
+```
 source /opt/lampp/htdocs/Comfachoco/database.sql
 
 # O desde phpMyAdmin:
