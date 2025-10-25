@@ -398,6 +398,49 @@ chmod 644 /opt/lampp/htdocs/Comfachoco/uploads/*
 - Las tablas y columnas son case-sensitive en algunos sistemas
 - Usar siempre minúsculas para nombres de tablas y columnas
 
+### 4. Interfas de un siste de ComfaChoco - Sistema de Gestión de Recursos Humanos
+
+## 4.1 Usuarios
+
+Al ingresar al sistema, el usuario encontrará una pantalla de inicio de sesión diseñada para ser limpia, moderna y no invasiva.
+El objetivo es ofrecer una experiencia intuitiva y agradable, facilitando el acceso a las funcionalidades principales del sistema.
+
+El inicio de sesión se realiza mediante el número de cédula del usuario, garantizando un proceso rápido y sencillo.
+
+<p align="center"> <img src="assets/images/interfas_usuario_1.png" alt="Pantalla de inicio de sesión de ComfaChoco" width="600"> </p>
+
+Una vez dentro del sistema, el usuario podrá interactuar con un chatbot asistente, el cual lo guiará paso a paso en la gestión de sus solicitudes, como permisos, vacaciones y otras peticiones relacionadas con el área de recursos humanos.
+
+<p align="center"> <img src="assets/images/interfas_usuario_2.png" alt="Chatbot asistente de ComfaChoco" width="600"> </p>
+
+
+
+## 4.2 Administrador
+
+El panel de administración está diseñado para ofrecer una vista completa y organizada de toda la información del sistema.
+Desde este módulo, los administradores pueden gestionar empleados, solicitudes, políticas internas y métricas de desempeño, todo desde un entorno moderno y seguro.
+
+La interfaz presenta un dashboard principal con indicadores clave (KPIs) que resumen el estado actual de la organización: número de empleados, solicitudes pendientes, permisos aprobados y estadísticas de actividad reciente.
+
+
+<p align="center"> <img src="assets/images/dashboar.png" alt="Dashboard administrativo de ComfaChoco" width="600"> </p>  
+
+
+Solicitudes 
+
+
+<p align="center"> <img src="assets/images/Solicitudes.png" alt="Solicitudes administrativo de ComfaChoco" width="600"> </p>  
+
+
+Calendario
+
+<p align="center"> <img src="assets/images/Calendario.png" alt="Calendario administrativo de ComfaChoco" width="600"> </p>  
+
+Politicas
+
+<p align="center"> <img src="assets/images/politicas.png" alt="Politicas administrativo de ComfaChoco" width="600"> </p>  
+
+
 ## Soporte
 
 Para reportar problemas o solicitar ayuda:
